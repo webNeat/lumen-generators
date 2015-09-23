@@ -37,6 +37,8 @@ class ModelCommand extends BaseCommand {
     	$arg = ($isOption) ? $this->option($arg) : $this->argument($arg);
         if(is_string($arg)){
         	$arg = explode(',', $arg);
+        } else {
+            $arg = [];
         }
         return implode(', ', array_map(function($item){
             return '"' . $item . '"';
