@@ -1,0 +1,9 @@
+{
+	"type": "array",
+    "separator": " ",
+	"fields": {
+        "type": "object",
+        "separator": "=",
+        "fields": ["name","rule"]
+    }
+}

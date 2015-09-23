@@ -3699,12 +3699,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webNeat/lumen-generators.git",
-                "reference": "04ce3077cd2723b38424e1ea94844582b67c6b79"
+                "reference": "4a60029604f1b12d81e135761dc255fe2f500b04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webNeat/lumen-generators/zipball/04ce3077cd2723b38424e1ea94844582b67c6b79",
-                "reference": "04ce3077cd2723b38424e1ea94844582b67c6b79",
+                "url": "https://api.github.com/repos/webNeat/lumen-generators/zipball/4a60029604f1b12d81e135761dc255fe2f500b04",
+                "reference": "4a60029604f1b12d81e135761dc255fe2f500b04",
                 "shasum": ""
             },
             "require": {
@@ -3736,7 +3736,7 @@
                 "lumen",
                 "rest"
             ],
-            "time": "2015-09-23 03:58:39"
+            "time": "2015-09-23 04:38:56"
         }
     ],
     "aliases": [],

@@ -8,6 +8,10 @@ class {{name}} extends Model {
 
 	protected $dates = [{{dates}}];
 
+	public $rules = [
+{{rules}}
+	];
+
 {{relations}}
-	
+
 }

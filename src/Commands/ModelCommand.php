@@ -4,11 +4,14 @@
 class ModelCommand extends BaseCommand {
 
 	protected $signature = 'wn:model
-        {name : Name of the model}
-        {--fillable= : the fillable fields of the model}
-        {--dates= : date fields of the model}
-        {--has-many= : on-to-many relationships of the model}
-        {--path=app : where to store the model php file}';
+        {name : Name of the model.}
+        {--fillable= : the fillable fields.}
+        {--dates= : date fields.}
+        {--has-many= : hasMany relationships.}
+        {--has-one= : hasOne relationships.}
+        {--belongs-to= : belongsTo relationships.}
+        {--rules= : fields validation rules.}
+        {--path=app : where to store the model php file.}';
 
 	protected $description = 'Generates a model class for a RESTfull resource';
 
@@ -25,7 +28,8 @@ class ModelCommand extends BaseCommand {
                 'namespace' => $this->getNamespace(),
                 'fillable' => $this->getAsArrayFields('fillable'),
                 'dates' => $this->getAsArrayFields('dates'),
-                'relations' => $this->getRelations()
+                'relations' => $this->getRelations(),
+                'rules' => $this->getRules()
             ])
             ->get();
 
@@ -55,10 +59,16 @@ class ModelCommand extends BaseCommand {
     protected function getRelations()
     {
         $relations = array_merge([], 
-            $this->getRelationsByType('hasMany', 'has-many')
+            $this->getRelationsByType('hasOne', 'has-one'),
+            $this->getRelationsByType('hasMany', 'has-many'),
+            $this->getRelationsByType('belongsTo', 'belongs-to')
         );
 
-        return implode("\n\n", $relations);
+        if(empty($relations)){
+            return "\t// Relationships";
+        }
+
+        return implode(PHP_EOL, $relations);
     }
 
     protected function getRelationsByType($type, $option)
@@ -81,4 +91,22 @@ class ModelCommand extends BaseCommand {
         }
         return $relations;
     }
+
+    protected function getRules()
+    {
+        $rules = $this->option('rules');
+        if(! $rules){
+            return "\t\t// Validation rules";
+        }
+        $parser = $this->getArgumentParser('rules');
+        $template = $this->getTemplate('model/rule');
+        $items = $parser->parse($rules);
+        $rules = [];
+        foreach ($items as $item) {
+            $rules[] = $template->with($item)->get();
+        }
+
+        return implode(PHP_EOL, $rules);
+    }
+    
 }

@@ -8,6 +8,12 @@ class TestingModel extends Model {
 
 	protected $dates = [];
 
+	public $rules = [
+		"name" => "required",
+		"age" => "integer|min:13",
+		"email" => "email|unique:users,email_address",
+	];
 
-	
+	// Relationships
+
 }
