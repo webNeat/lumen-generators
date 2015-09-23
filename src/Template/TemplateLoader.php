@@ -1,6 +1,8 @@
 <?php namespace Wn\Generators\Template;
 
+use Illuminate\Filesystem\Filesystem;
 use Wn\Generators\Exceptions\TemplateException;
+use Wn\Generators\Template\Template;
 
 
 class TemplateLoader {

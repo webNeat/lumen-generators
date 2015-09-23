@@ -1,5 +1,9 @@
 <?php namespace Wn\Generators\Argument;
 
+use Illuminate\Filesystem\Filesystem;
+use Wn\Generators\Argument\ArgumentFormat;
+use Wn\Generators\Exceptions\ArgumentFormatException;
+
 
 class ArgumentFormatLoader {
 
@@ -59,7 +63,7 @@ class ArgumentFormatLoader {
 	    
 	    if ($isArray) {
 	        $format->type    = 'array';
-	        $subFormat       = new Format;
+	        $subFormat       = new ArgumentFormat;
 	        $subFormat->type = $type ?: 'string';            
 	        $format->format  = $subFormat;
 	    } else {

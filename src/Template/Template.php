@@ -1,5 +1,7 @@
 <?php namespace Wn\Generators\Template;
 
+use Wn\Generators\Template\TemplateLoader;
+
 
 class Template {
 

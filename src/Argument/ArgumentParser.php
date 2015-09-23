@@ -1,6 +1,7 @@
 <?php namespace Wn\Generators\Argument;
 
 use Wn\Generators\Argument\ArgumentFormat;
+use Wn\Generators\Exceptions\ArgumentParserException;
 
 
 class ArgumentParser {
@@ -53,7 +54,7 @@ class ArgumentParser {
 	    }
 	}
 
-	protected function parseArray($token, $separator, Format $format)
+	protected function parseArray($token, $separator, ArgumentFormat $format)
 	{
 	    $result = [];
 	    $tokens = explode($separator, $token);

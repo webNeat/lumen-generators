@@ -1,7 +1,7 @@
 <?php namespace Wn\Generators\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Filesystem\Filesystem;
 use Wn\Generators\Argument\ArgumentFormatLoader;
 use Wn\Generators\Argument\ArgumentParser;
 use Wn\Generators\Template\TemplateLoader;
