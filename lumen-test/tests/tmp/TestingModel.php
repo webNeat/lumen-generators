@@ -6,6 +6,8 @@ class TestingModel extends Model {
 
 	protected $fillable = [];
 
-	protected $dates = ["started_at"];
+	protected $dates = [];
+
+
 	
 }

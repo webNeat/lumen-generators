@@ -1,7 +1,8 @@
 {
 	"type": "array",
-	"format": {
+	"fields": {
         "type": "object",
+        "separator": ":",
         "fields": [
             "name",
             {

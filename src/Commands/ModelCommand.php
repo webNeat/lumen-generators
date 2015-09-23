@@ -73,6 +73,8 @@ class ModelCommand extends BaseCommand {
                 $item['type'] = $type;
                 if(! $item['model']){
                     $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
+                } else if(strpos($item['model'], '\\') === false ){
+                    $item['model'] = $this->getNamespace() . '\\' . $item['model'];
                 }
                 $relations[] = $template->with($item)->get();
             }
