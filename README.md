@@ -1,3 +1,3 @@
-# lumen-rest-generators
+# Lumen generators
 
-Restful resources generators for Lumen and Laravel 5.
+A collection of generators for Lumen and Laravel 5.

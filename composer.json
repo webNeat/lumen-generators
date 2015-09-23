@@ -1,6 +1,6 @@
 {
-    "name": "wn/lumen-rest-generators",
-    "description": "Restful resources generators for Lumen and Laravel 5.",
+    "name": "wn/lumen-generators",
+    "description": "A collection of generators for Lumen and Laravel 5.",
 	"keywords": ["lumen", "laravel", "rest", "api", "generators"],
     "license": "MIT",
     "authors": [
