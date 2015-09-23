@@ -7,6 +7,7 @@ class ModelCommand extends BaseCommand {
         {name : Name of the model}
         {--fillable= : the fillable fields of the model}
         {--dates= : date fields of the model}
+        {--has-many= : on-to-many relationships of the model}
         {--path=app : where to store the model php file}';
 
 	protected $description = 'Generates a model class for a RESTfull resource';
@@ -23,7 +24,8 @@ class ModelCommand extends BaseCommand {
                 'name' => $name,
                 'namespace' => $this->getNamespace(),
                 'fillable' => $this->getAsArrayFields('fillable'),
-                'dates' => $this->getAsArrayFields('dates')
+                'dates' => $this->getAsArrayFields('dates'),
+                'relations' => $this->getRelations()
             ])
             ->get();
 
@@ -50,4 +52,31 @@ class ModelCommand extends BaseCommand {
     	return str_replace(' ', '\\', ucwords(str_replace('/', ' ', $this->option('path'))));
     }
 	
+    protected function getRelations()
+    {
+        $relations = array_merge([], 
+            $this->getRelationsByType('hasMany', 'has-many')
+        );
+
+        return implode("\n\n", $relations);
+    }
+
+    protected function getRelationsByType($type, $option)
+    {
+        $relations = [];
+        $option = $this->option($option);
+        if($option){
+            $parser = $this->getArgumentParser('relations');
+            $template = $this->getTemplate('model/relation');
+            $items = $parser->parse($option);
+            foreach ($items as $item) {
+                $item['type'] = $type;
+                if(! $item['model']){
+                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
+                }
+                $relations[] = $template->with($item)->get();
+            }
+        }
+        return $relations;
+    }
 }

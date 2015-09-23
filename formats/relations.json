@@ -1,0 +1,14 @@
+{
+	"type": "array",
+	"format": {
+        "type": "object",
+        "fields": [
+            "name",
+            {
+                "name": "model", 
+                "type": "string",
+                "default": false
+            }
+        ]
+    }
+}

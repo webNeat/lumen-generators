@@ -7,5 +7,7 @@ class {{name}} extends Model {
 	protected $fillable = [{{fillable}}];
 
 	protected $dates = [{{dates}}];
+
+{{relations}}
 	
 }
