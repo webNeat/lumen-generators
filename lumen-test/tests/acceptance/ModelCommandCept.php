@@ -72,3 +72,5 @@ $I->seeInThisFile('
 		"email" => "email|unique:users,email_address",
 	];
 ');
+
+$I->deleteFile('./tests/tmp/TestingModel.php');

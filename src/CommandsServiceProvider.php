@@ -7,10 +7,9 @@ class CommandsServiceProvider extends ServiceProvider
 
     public function register()
     {
-        // $this->register
         $this->registerModelCommand();
         $this->registerControllerRestActionsCommand();
-        // $this->registerControllerCommand();
+        $this->registerControllerCommand();
         // $this->registerMigrationCommand();
         // $this->registerSeedCommand();
         // $this->registerRouteCommand();
