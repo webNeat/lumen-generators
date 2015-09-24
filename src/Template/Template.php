@@ -21,7 +21,7 @@ class Template {
 		$this->text = $text;
 		$this->compiled = '';
 		$this->data = [];
-		$this->dirty = false;
+		$this->dirty = true;
 	}
 
 	public function clean()

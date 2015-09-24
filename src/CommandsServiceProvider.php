@@ -9,6 +9,7 @@ class CommandsServiceProvider extends ServiceProvider
     {
         // $this->register
         $this->registerModelCommand();
+        $this->registerControllerRestActionsCommand();
         // $this->registerControllerCommand();
         // $this->registerMigrationCommand();
         // $this->registerSeedCommand();
@@ -22,6 +23,14 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ModelCommand'];
         });
         $this->commands('command.wn.model');
+
+    }
+
+    protected function registerControllerRestActionsCommand(){
+        $this->app->singleton('command.wn.controller.rest-actions', function($app){
+            return $app['Wn\Generators\Commands\ControllerRestActionsCommand'];
+        });
+        $this->commands('command.wn.controller.rest-actions');
 
     }
 

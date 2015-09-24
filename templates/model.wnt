@@ -8,7 +8,7 @@ class {{name}} extends Model {
 
 	protected $dates = [{{dates}}];
 
-	public $rules = [
+	public static $rules = [
 {{rules}}
 	];
 

@@ -35,7 +35,7 @@ class ModelCommand extends BaseCommand {
 
         $this->save($content, "./{$path}/{$name}.php");
 
-        $this->info("Model {$name} Generated !");
+        $this->info("{$name} model generated !");
     }
 
     protected function getAsArrayFields($arg, $isOption = true)
