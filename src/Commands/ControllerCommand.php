@@ -4,7 +4,8 @@
 class ControllerCommand extends BaseCommand {
 
 	protected $signature = 'wn:controller
-		{model : Name of the model (with namespace if not App;}';
+        {model : Name of the model (with namespace if not App;)}
+		{--no-routes= : without routes}';
 
 	protected $description = 'Generates RESTful controller using the RESTActions trait';
 
@@ -19,17 +20,24 @@ class ControllerCommand extends BaseCommand {
     		$name = explode("\\", $model);
     		$name = $name[count($name) - 1];
     	}
-    	$name = ucwords(str_plural($name));
+        $controller = ucwords(str_plural($name)) . 'Controller';
         $content = $this->getTemplate('controller')
         	->with([
-        		'name' => $name,
+        		'name' => $controller,
         		'model' => $model
         	])
         	->get();
 
-        $this->save($content, "./app/Http/Controllers/{$name}Controller.php");
+        $this->save($content, "./app/Http/Controllers/{$controller}.php");
 
-        $this->info("{$name}Controller generated !");
+        $this->info("{$controller} generated !");
+
+        if(! $this->option('no-routes')){
+            $this->call('wn:route', [
+                'resource' => snake_case($name, '-'),
+                '--controller' => $controller
+            ]);
+        }
     }
     
 }

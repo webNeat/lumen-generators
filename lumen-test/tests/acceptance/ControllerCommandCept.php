@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a RESTful controller with short model name');
-$I->runShellCommand('php artisan wn:controller Test');
+$I->runShellCommand('php artisan wn:controller Test --no-routes');
 $I->seeInShellOutput('TestsController generated');
 $I->seeFileFound('./app/Http/Controllers/TestsController.php');
 $I->openFile('./app/Http/Controllers/TestsController.php');
@@ -19,7 +19,7 @@ class TestsController extends Controller {
 ');
 $I->deleteFile('./app/Http/Controllers/TestsController.php');
 
-$I->wantTo('generate a RESTful controller with full model name');
+$I->wantTo('generate a RESTful controller with full model name and routes');
 $I->runShellCommand('php artisan wn:controller "App\Models\Category"');
 $I->seeInShellOutput('CategoriesController generated');
 $I->seeFileFound('./app/Http/Controllers/CategoriesController.php');
@@ -36,3 +36,28 @@ class CategoriesController extends Controller {
 }
 ');
 $I->deleteFile('./app/Http/Controllers/CategoriesController.php');
+$I->openFile('./app/Http/routes.php');
+$I->seeInThisFile("
+\$app->get('category', 'CategoriesController@all');
+\$app->get('category/{id}', 'CategoriesController@get');
+\$app->post('category', 'CategoriesController@add');
+\$app->put('category/{id}', 'CategoriesController@put');
+\$app->delete('category/{id}', 'CategoriesController@remove');
+");
+$I->writeToFile('./app/Http/routes.php', '<?php
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It is a breeze. Simply tell Lumen the URIs it should respond to
+| and give it the Closure to call when that URI is requested.
+|
+*/
+
+$app->get("/", function () use ($app) {
+    return $app->welcome();
+});
+');

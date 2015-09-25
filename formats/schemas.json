@@ -1,0 +1,24 @@
+{
+	"type": "array",
+    "separator": " ",
+	"fields": {
+        "type": "array",
+        "separator": ":",
+        "fields": {
+        	"type": "object",
+        	"separator": ".",
+        	"fields": [
+        		"name",
+        		{
+        			"name": "args",
+        			"type": "array",
+        			"separator": ",",
+        			"default": [],
+        			"fields": {
+        				"type": "string"
+        			}
+        		}
+        	]
+        }
+    }
+}
