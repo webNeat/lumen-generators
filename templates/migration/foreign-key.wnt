@@ -1,0 +1,3 @@
+            $table->foreign('{{name}}')
+                ->references('{{column}}')
+                ->on('{{table}}')

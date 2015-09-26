@@ -5,7 +5,10 @@ class MigrationCommand extends BaseCommand {
 
 	protected $signature = 'wn:migration
         {table : The table name.}
-        {--schema= : the schema.}';
+        {--schema= : the schema.}
+        {--keys= : foreign keys.}
+        {--file= : name of the migration file.}
+        ';
         // {action : One of create, add, remove or drop options.}
         // The action is only create for the moment
 
@@ -20,12 +23,17 @@ class MigrationCommand extends BaseCommand {
             ->with([
                 'table' => $table,
                 'name' => $name,
-                'schema' => $this->getSchema()
+                'schema' => $this->getSchema(),
+                'constraints' => $this->getConstraints()
             ])
             ->get();
 
-        $name = snake_case($name);
-        $this->save($content, "./database/migrations/{$name}.php");
+        $file = $this->option('file');
+        if(! $file){
+            $file = date('Y_m_d_His_') . snake_case($name);
+        }
+
+        $this->save($content, "./database/migrations/{$file}.php");
 
         $this->info("{$table} migration generated !");
     }
@@ -34,7 +42,7 @@ class MigrationCommand extends BaseCommand {
     {
         $schema = $this->option('schema');
         if(! $schema){
-            return "\t\t\t// Schema declaration";
+            return "            // Schema declaration";
         }
 
         $items = $this->getArgumentParser('schema')->parse($schema);
@@ -55,7 +63,62 @@ class MigrationCommand extends BaseCommand {
         $parts = array_map(function($part){
             return '->' . $part['name'] . '(' . implode(', ', $part['args']) . ')';
         }, $parts);
-        return "\t\t\t\$table" . implode('', $parts) . ';';
+        return "            \$table" . implode('', $parts) . ';';
+    }
+
+    protected function getConstraints()
+    {
+        $keys = $this->option('keys');
+        if(! $keys){
+            return "            // Constraints declaration";
+        }
+
+        $items = $this->getArgumentParser('foreign-keys')->parse($keys);
+
+        $constraints = [];
+        foreach ($items as $item) {
+            $constraints[] = $this->getConstraintDeclaration($item);
+        }
+
+        return implode(PHP_EOL, $constraints);
+    }
+
+    protected function getConstraintDeclaration($key)
+    {
+        if(! $key['column']){
+            $key['column'] = 'id';
+        }
+        if(! $key['table']){
+            $key['table'] = str_plural(substr($key['name'], 0, count($key['name']) - 4));
+        }
+
+        $constraint = $this->getTemplate('migration/foreign-key')
+            ->with([
+                'name' => $key['name'],
+                'table' => $key['table'],
+                'column' => $key['column']
+            ])
+            ->get();
+
+        if($key['on_delete']){
+            $constraint .= PHP_EOL . $this->getTemplate('migration/on-constraint')
+                ->with([
+                    'event' => 'Delete',
+                    'action' => $key['on_delete']
+                ])
+                ->get();
+        }
+
+        if($key['on_update']){
+            $constraint .= PHP_EOL . $this->getTemplate('migration/on-constraint')
+                ->with([
+                    'event' => 'Update',
+                    'action' => $key['on_update']
+                ])
+                ->get();
+        }
+
+        return $constraint . ';';
     }
     
 }

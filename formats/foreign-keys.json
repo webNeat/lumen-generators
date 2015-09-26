@@ -1,0 +1,31 @@
+{
+	"type": "array",
+    "separator": " ",
+	"fields": {
+        "type": "object",
+        "separator": ":",
+        "fields": [
+            "name",
+            {
+                "name": "column",
+                "type": "string",
+                "default": ""
+            },
+            {
+                "name": "table",
+                "type": "string",
+                "default": ""
+            },
+            {
+                "name": "on_delete",
+                "type": "string",
+                "default": ""
+            },
+            {
+                "name": "on_update",
+                "type": "string",
+                "default": ""
+            }
+        ]
+    }
+}

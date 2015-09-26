@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a migration without schema');
-$I->runShellCommand('php artisan wn:migration tasks');
+$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks');
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');
@@ -18,7 +18,8 @@ class CreateTasksMigration extends Migration
     {
         Schema::create(\'tasks\', function(Blueprint $table) {
             $table->increments(\'id\');
-			// Schema declaration
+            // Schema declaration
+            // Constraints declaration
             $table->timestamps();
         });
     }
@@ -31,8 +32,8 @@ class CreateTasksMigration extends Migration
 ');
 $I->deleteFile('./database/migrations/create_tasks.php');
 
-$I->wantTo('generate a migration without schema');
-$I->runShellCommand('php artisan wn:migration tasks --schema="amount:decimal.5,2:after.\'size\':default.8 title:string:nullable"');
+$I->wantTo('generate a migration with schema');
+$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --schema="amount:decimal.5,2:after.\'size\':default.8 title:string:nullable"');
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');
@@ -48,8 +49,9 @@ class CreateTasksMigration extends Migration
     {
         Schema::create(\'tasks\', function(Blueprint $table) {
             $table->increments(\'id\');
-			$table->decimal(\'amount\', 5, 2)->after(\'size\')->default(8);
-			$table->string(\'title\')->nullable();
+            $table->decimal(\'amount\', 5, 2)->after(\'size\')->default(8);
+            $table->string(\'title\')->nullable();
+            // Constraints declaration
             $table->timestamps();
         });
     }
@@ -60,4 +62,18 @@ class CreateTasksMigration extends Migration
     }
 }
 ');
+$I->deleteFile('./database/migrations/create_tasks.php');
+
+$I->wantTo('generate a migration with schema and foreign keys');
+$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --keys="category_type_id user_id:identifier:members:cascade" --schema="amount:decimal.5,2:after.\'size\':default.8 title:string:nullable"');
+$I->seeInShellOutput('tasks migration generated');
+$I->seeFileFound('./database/migrations/create_tasks.php');
+$I->openFile('./database/migrations/create_tasks.php');
+$I->seeInThisFile('$table->foreign(\'category_type_id\')
+                ->references(\'id\')
+                ->on(\'category_types\');');
+$I->seeInThisFile('$table->foreign(\'user_id\')
+                ->references(\'identifier\')
+                ->on(\'members\')
+                ->onDelete(\'cascade\');');
 $I->deleteFile('./database/migrations/create_tasks.php');
