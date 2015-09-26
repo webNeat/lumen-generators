@@ -11,7 +11,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerControllerRestActionsCommand();
         $this->registerControllerCommand();
         $this->registerRouteCommand();
-        // $this->registerMigrationCommand();
+        $this->registerMigrationCommand();
         // $this->registerSeedCommand();
         // $this->registerTestCommand();
         // $this->registerResourceCommand();

@@ -15,8 +15,6 @@ class ModelCommand extends BaseCommand {
 
 	protected $description = 'Generates a model class for a RESTfull resource';
 
-    protected $fields = [];
-
     public function handle()
     {
         $name = $this->argument('name');
