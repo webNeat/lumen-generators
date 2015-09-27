@@ -1,33 +1,119 @@
-<?php
-/*
-wn:resource
-		{name : Name of the resource.}
-        {--fields= : fields description.}
-        	name
-        	schema
-        	attrs: fillable, date
-        	rules
+<?php namespace Wn\Generators\Commands;
+
+
+class ResourceCommand extends BaseCommand {
+
+    protected $signature = 'wn:resource
+        {name : Name of the resource.}
+        {fields : fields description.}
         {--has-many= : hasMany relationships.}
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
+        {--migration-file= : the migration file name.}
+        ';
 
-wn:migration
-	table => str_plural(name)
-	--schema => 
-wn:route
-	resource => name
+    protected $description = 'Generates a model, migration, controller and routes for RESTful resource';
 
-wn:controller
-    model => (namespace from --model-path) ucwords(camel_case(name))
-	--no-routes => true
+    protected $fields;
 
-wn:model
-    name => ucwords(camel_case(name))
-    --fillable => having_fillable_attr(fields)
-    --dates => having_date_attr(fields)
-    --rules => rules_of(fields)
-    --path => --model-path
-    --has-many => --has-many
-    --has-one => --has-one
-    --belongs-to => --belongs-to
-*/
+    public function handle()
+    {
+        $this->parseFields();
+
+        $resourceName = $this->argument('name');
+        $modelName = ucwords(camel_case($resourceName));
+        $tableName = str_plural($resourceName);
+
+        // generating the model
+        $this->call('wn:model', [
+            'name' => $modelName,
+            '--fillable' => $this->fieldsHavingTag('fillable'),
+            '--dates' => $this->fieldsHavingTag('date'),
+            '--has-many' => $this->option('has-many'),
+            '--has-one' => $this->option('has-one'),
+            '--belongs-to' => $this->option('belongs-to'),
+            '--rules' => $this->rules(),
+            '--path' => 'app',
+            '--parsed' => true
+        ]);
+        
+        // generating the migration
+        $this->call('wn:migration', [
+            'table' => $tableName,
+            '--schema' => $this->schema(),
+            '--keys' => $this->foreignKeys(),
+            '--file' => $this->option('migration-file'),
+            '--parsed' => true
+        ]);
+        
+        // generation REST actions trait if doesn't exist
+        if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
+            $this->call('wn:controller:rest-actions');
+        }
+        
+        // generating the controller and routes
+        $this->call('wn:controller', [
+            'model' => $modelName,
+            '--no-routes' => false
+        ]);
+
+    }
+
+    protected function parseFields()
+    {
+        $fields = $this->argument('fields');
+        if(! $fields){
+            $this->fields = [];
+        } else {
+            $this->fields = $this->getArgumentParser('fields')
+                ->parse($fields);
+        }
+    }
+    
+    protected function fieldsHavingTag($tag)
+    {
+        return array_map(function($field){
+            return $field['name'];
+        }, array_filter($this->fields, function($field) use($tag){
+            return in_array($tag, $field['tags']);
+        }));
+    }
+
+    protected function rules()
+    {
+        return array_map(function($field){
+            return [
+                'name' => $field['name'],
+                'rule' => $field['rules']
+            ];
+        }, array_filter($this->fields, function($field){
+            return !empty($field['rules']);
+        }));
+    }
+
+    protected function schema()
+    {
+        return array_map(function($field){
+            return array_merge([[
+                'name' => $field['name'],
+                'args' => []
+            ]], $field['schema']);
+        }, $this->fields);
+    }
+
+    protected function foreignKeys()
+    {
+        return array_map(function($field){
+            return [
+                'name' => $field['name'],
+                'column' => '',
+                'table' => '',
+                'on_delete' => '',
+                'on_update' => ''
+            ];
+        }, array_filter($this->fields, function($field){
+            return in_array('key', $field['tags']);
+        }));
+    }
+
+}

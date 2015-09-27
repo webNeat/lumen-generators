@@ -12,7 +12,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerControllerCommand();
         $this->registerRouteCommand();
         $this->registerMigrationCommand();
-        // $this->registerResourceCommand();
+        $this->registerResourceCommand();
         // $this->registerSeedCommand();
         // $this->registerTestCommand();
     }

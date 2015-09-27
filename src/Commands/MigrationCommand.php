@@ -8,6 +8,7 @@ class MigrationCommand extends BaseCommand {
         {--schema= : the schema.}
         {--keys= : foreign keys.}
         {--file= : name of the migration file.}
+        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         ';
         // {action : One of create, add, remove or drop options.}
         // The action is only create for the moment
@@ -45,7 +46,10 @@ class MigrationCommand extends BaseCommand {
             return "            // Schema declaration";
         }
 
-        $items = $this->getArgumentParser('schema')->parse($schema);
+        $items = $schema;
+        if( ! $this->option('parsed')){
+            $items = $this->getArgumentParser('schema')->parse($schema);
+        }
 
         $fields = [];
         foreach ($items as $item) {
@@ -73,7 +77,10 @@ class MigrationCommand extends BaseCommand {
             return "            // Constraints declaration";
         }
 
-        $items = $this->getArgumentParser('foreign-keys')->parse($keys);
+        $items = $keys;
+        if(! $this->option('parsed')){
+            $items = $this->getArgumentParser('foreign-keys')->parse($keys);
+        }
 
         $constraints = [];
         foreach ($items as $item) {

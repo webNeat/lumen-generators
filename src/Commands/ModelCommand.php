@@ -11,7 +11,8 @@ class ModelCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--rules= : fields validation rules.}
-        {--path=app : where to store the model php file.}';
+        {--path=app : where to store the model php file.}
+        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}';
 
 	protected $description = 'Generates a model class for a RESTfull resource';
 
@@ -41,7 +42,7 @@ class ModelCommand extends BaseCommand {
     	$arg = ($isOption) ? $this->option($arg) : $this->argument($arg);
         if(is_string($arg)){
         	$arg = explode(',', $arg);
-        } else {
+        } else if(! is_array($arg)) {
             $arg = [];
         }
         return implode(', ', array_map(function($item){
@@ -74,9 +75,10 @@ class ModelCommand extends BaseCommand {
         $relations = [];
         $option = $this->option($option);
         if($option){
-            $parser = $this->getArgumentParser('relations');
+            
+            $items = $this->getArgumentParser('relations')->parse($option);
+            
             $template = $this->getTemplate('model/relation');
-            $items = $parser->parse($option);
             foreach ($items as $item) {
                 $item['type'] = $type;
                 if(! $item['model']){
@@ -96,10 +98,12 @@ class ModelCommand extends BaseCommand {
         if(! $rules){
             return "\t\t// Validation rules";
         }
-        $parser = $this->getArgumentParser('rules');
-        $template = $this->getTemplate('model/rule');
-        $items = $parser->parse($rules);
+        $items = $rules;
+        if(! $this->option('parsed')){
+            $items = $this->getArgumentParser('rules')->parse($rules);
+        }
         $rules = [];
+        $template = $this->getTemplate('model/rule');
         foreach ($items as $item) {
             $rules[] = $template->with($item)->get();
         }
