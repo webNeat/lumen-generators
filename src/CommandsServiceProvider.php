@@ -13,6 +13,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerRouteCommand();
         $this->registerMigrationCommand();
         $this->registerResourceCommand();
+        $this->registerResourcesCommand();
         // $this->registerSeedCommand();
         // $this->registerTestCommand();
     }
@@ -78,6 +79,14 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ResourceCommand'];
         });
         $this->commands('command.wn.resource');
+
+    }
+
+    protected function registerResourcesCommand(){
+        $this->app->singleton('command.wn.resources', function($app){
+            return $app['Wn\Generators\Commands\ResourcesCommand'];
+        });
+        $this->commands('command.wn.resources');
 
     }
 

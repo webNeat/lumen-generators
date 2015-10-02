@@ -4,7 +4,7 @@
 class ControllerCommand extends BaseCommand {
 
 	protected $signature = 'wn:controller
-        {model : Name of the model (with namespace if not App;)}
+        {model : Name of the model (with namespace if not App)}
 		{--no-routes= : without routes}';
 
 	protected $description = 'Generates RESTful controller using the RESTActions trait';

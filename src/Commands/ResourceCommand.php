@@ -10,6 +10,7 @@ class ResourceCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--migration-file= : the migration file name.}
+        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         ';
 
     protected $description = 'Generates a model, migration, controller and routes for RESTful resource';
@@ -62,7 +63,9 @@ class ResourceCommand extends BaseCommand {
     protected function parseFields()
     {
         $fields = $this->argument('fields');
-        if(! $fields){
+        if($this->option('parsed')){
+            $this->fields = $fields;
+        } else if(! $fields){
             $this->fields = [];
         } else {
             $this->fields = $this->getArgumentParser('fields')
