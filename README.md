@@ -18,7 +18,7 @@ Add the generators package to your composer.json by running the command:
 
 Then add the service provider in the file `app/Providers/AppServiceProvider.php`like the following:
 
-```
+```php
 public function register()
 {
     if ($this->app->environment() == 'local') {
@@ -33,27 +33,28 @@ public function register()
 If you run the command `php artisan list` you will see the list of added commands:
 
 ```
-wn
-	wn:controller               Generates RESTful controller using the RESTActions trait
-	wn:controller:rest-actions  Generates REST actions trait to use into controllers
-	wn:migration                Generates a migration to create a table with schema
-	wn:model                    Generates a model class for a RESTfull resource
-	wn:resource                 Generates a model, migration, controller and routes for RESTful resource
-	wn:resources                Generates multiple resources from a file
-	wn:route                    Generates RESTful routes.
+wn:controller               Generates RESTful controller using the RESTActions trait
+wn:controller:rest-actions  Generates REST actions trait to use into controllers
+wn:migration                Generates a migration to create a table with schema
+wn:model                    Generates a model class for a RESTfull resource
+wn:resource                 Generates a model, migration, controller and routes for RESTful resource
+wn:resources                Generates multiple resources from a file
+wn:route                    Generates RESTful routes.
 ```
 
 ## Quick Usage
 
 To generate a RESTful resource for your application (model, migration, controller and RESTful routes), you simply need to run one single command. For example: 
 
-`php artisan wn:resource task "name;string;required;fillable project_id;integer:unsigned;numeric;fillable,key due;date;;date" --belongs-to=project`
+```
+php artisan wn:resource task "name;string;required;fillable project_id;integer:unsigned;numeric;fillable,key due;date;;date" --belongs-to=project
+```
 
 will generate these files:
 
 **app/Task.php**
 
-```
+```php
 <?php namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -80,7 +81,7 @@ class Task extends Model {
 
 **app/Http/Controllers/RESTActions.php**
 
-```
+```php
 <?php namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -153,7 +154,7 @@ trait RESTActions {
 
 **app/Http/Controllers/TasksController.php**
 
-```
+```php
 <?php namespace App\Http\Controllers;
 
 
@@ -168,7 +169,7 @@ class TasksController extends Controller {
 
 **app/Http/routes.php**
 
-```
+```php
 // These lignes will be added
 /**
  * Routes for resource task
@@ -182,7 +183,7 @@ $app->delete('task/{id}', 'TasksController@remove');
 
 **database/migrations/date_time_create_tasks.php**
 
-```
+```php
 <?php
 
 use Illuminate\Database\Schema\Blueprint;
@@ -223,13 +224,15 @@ More then that, you can generate multiple resources with only one command ! [Cli
 
 The `wn:model` command is used to generate a model class based on Eloquent. It has the following syntax:
 
-`wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--rules=...] [--path=...]`
+```
+wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--rules=...] [--path=...]
+```
 
 - **name**: the name of the model. 
 
 `php artisan wn:model Task` generates the following:
 
-```
+```php
 <?php namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -253,7 +256,7 @@ class Task extends Model {
 
 `php artisan wn:model Task --fillable=name,title` gives:
 
-```
+```php
 //...	
 	protected $fillable = ['name', 'title'];
 ```
@@ -262,7 +265,7 @@ class Task extends Model {
 
 `php artisan wn:model Task --dates=started_at,published_at` gives:
 
-```
+```php
 //...	
 	protected $dates = ['started_at', 'published_at'];
 ```
@@ -271,16 +274,19 @@ class Task extends Model {
 
 `php artisan wn:model Task --path="app/Http/Models"` gives:
 
-```
+```php
 <?php namespace App\Http\Models;
 //...
 ```
 
 - **--has-one**, **--has-many** and **--belongs-to**: the relationships of the model following the syntax `relation1:model1,relation2:model2,...`. If the `model` is missing, it will be deducted from the relation's name. If the `model` is given without a namespace, it will be considered having the same namespace as the model being generated.
 
-`php artisan wn:model Task --has-many=accounts --belongs-to="owner:App\User" --has-one=number:Phone --path=tests/tmp` gives:
-
 ```
+php artisan wn:model Task --has-many=accounts --belongs-to="owner:App\User" --has-one=number:Phone --path=tests/tmp
+```
+gives:
+
+```php
 //...
 	public function accounts()
 	{
@@ -300,9 +306,12 @@ class Task extends Model {
 
 - **--rules**: specifies the validation rules of the model's fields. The syntax is `field1=rules1 field2=rules2 ...`.
 
-`php artisan wn:model TestingModel --rules="name=required age=integer|min:13 email=email|unique:users,email_address"`` gives:
-
 ```
+php artisan wn:model TestingModel --rules="name=required age=integer|min:13 email=email|unique:users,email_address"`
+```
+gives:
+
+```php
 // ...
 	public static $rules = [
 		"name" => "required",
@@ -315,7 +324,9 @@ class Task extends Model {
 
 The `wn:migration` command is used to generate a migration to create a table with schema. It has the following syntax:
 
-`wn:migration table [--schema=...] [--keys=...] [--file=...]`
+```
+wn:migration table [--schema=...] [--keys=...] [--file=...]
+```
 
 - **table**: the name of the table to create.
 
@@ -323,9 +334,12 @@ The `wn:migration` command is used to generate a migration to create a table wit
 
 - **--schema**: the schema of the table using the syntax `field1:type.arg1,ag2:modifier1:modifier2.. field2:...`. The `type` could be `text`, `string.50`, `decimal.5,2` for example. Modifiers can be `unique` or `nullable` for example. [See documentation](http://laravel.com/docs/5.1/migrations#creating-columns) for the list of available types and modifiers.
 
-`php artisan wn:migration tasks --schema="amount:decimal.5,2:after.'size':default.8 title:string:nullable"`  gives:
-
 ```
+php artisan wn:migration tasks --schema="amount:decimal.5,2:after.'size':default.8 title:string:nullable"
+```
+gives:
+
+```php
 <?php
 
 use Illuminate\Database\Schema\Blueprint;
@@ -354,9 +368,12 @@ class CreateTasksMigration extends Migration
 
 - **--keys**: the foreign keys of the table following the syntax `field:column:table:on_delete:on_update ...`. The `column` is optional ("id" by default). The `table` is optional if the field follows the naming convention `singular_table_name_id`. `on_delete` and `on_update` are optional too.
 
-`php artisan wn:migration tasks --keys="category_type_id user_id:identifier:members:cascade"` gives:
-
 ```
+php artisan wn:migration tasks --keys="category_type_id user_id:identifier:members:cascade"
+```
+gives:
+
+```php
 //...
 $table->foreign('category_type_id')
     ->references('id')
@@ -393,7 +410,7 @@ The second command is `wn:controller` which actually generates the controller. T
 `php artisan wn:controller Task --no-routes` gives:
 
 
-```
+```php
 <?php namespace App\Http\Controllers;
 
 
@@ -416,9 +433,9 @@ The `wn:route` command is used to generate RESTfull routes for a controller. It 
 
 - **--controller**: the corresponding controller. If missing it's deducted from the resource name.
 
-`php artisan wn:route project-type` gives the following routes:
+`php artisan wn:route project-type` adds the following routes:
 
-```
+```php
 $app->get('project-type', 'ProjectTypesController@all');
 $app->get('project-type/{id}', 'ProjectTypesController@get');
 $app->post('project-type', 'ProjectTypesController@add');
@@ -458,7 +475,7 @@ The `wn:resources` (note the "s" in "resources") command takes the generation pr
 
 The file given to the command should be a valid YAML file ( for the moment, support of other types like XML or JSON could be added in the future). An example is the following:
 
-```
+```yaml
 ---
 Store:
   hasMany: products
