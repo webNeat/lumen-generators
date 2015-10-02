@@ -2,7 +2,34 @@
 
 [![Build Status](https://travis-ci.org/webNeat/lumen-generators.svg?branch=master)](https://travis-ci.org/webNeat/lumen-generators)
 
-A collection of generators for Lumen and Laravel 5. Since Lumen comes 
+A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5](http://laravel.com/).
+
+## Contents
+
+- [Why](#why)
+
+- [Installation](#installation)
+
+- [Quick Usage](#quick-usage)
+
+- [Detailed Usage](#detailed-usage)
+
+	- [Model Generator](#model-generator)
+
+	- [Migration Generator](#migration-generator)
+
+	- [Controller Generator](#controller-generator)
+
+	- [Routes Generator](#routes-generator)
+
+	- [Resource Generator](#resource-generator)
+
+	- [Multiple Resources From File](#multiple-resources-from-file)
+
+- [Testing](#testing)
+
+- [Contributing](#contributing)
+
 
 ## Why ?
 
@@ -507,6 +534,10 @@ Product:
       rules: numeric
       tags: fillable
 ```
+
+## Testing
+
+To test the generators, I included a fresh lumen installation under the folder `lumen-test` to which I added this package and have written some acceptance tests using [Codeception](http://codeception.com/). To run tests you just have to execute the `install.sh` to install dependencies then execute `test.sh`.
 
 ## Contributing
 
