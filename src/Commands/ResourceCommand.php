@@ -9,6 +9,7 @@ class ResourceCommand extends BaseCommand {
         {--has-many= : hasMany relationships.}
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
+        {--belongs-to-many= : belongsToMany relationships.}
         {--migration-file= : the migration file name.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         ';
@@ -33,6 +34,7 @@ class ResourceCommand extends BaseCommand {
             '--has-many' => $this->option('has-many'),
             '--has-one' => $this->option('has-one'),
             '--belongs-to' => $this->option('belongs-to'),
+            '--belongs-to-many' => $this->option('belongs-to-many'),
             '--rules' => $this->rules(),
             '--path' => 'app',
             '--parsed' => true

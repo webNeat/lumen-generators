@@ -1,12 +1,13 @@
 # Lumen generators
 
 [![Build Status](https://travis-ci.org/webNeat/lumen-generators.svg?branch=master)](https://travis-ci.org/webNeat/lumen-generators)
+[![License](https://poser.pugx.org/laravel/framework/license.svg)](http://opensource.org/licenses/MIT)
 
 A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5](http://laravel.com/).
 
 ## Contents
 
-- [Why](#why)
+- [Why ?](#why)
 
 - [Installation](#installation)
 
@@ -17,6 +18,8 @@ A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5]
 	- [Model Generator](#model-generator)
 
 	- [Migration Generator](#migration-generator)
+
+	- [Pivot Table Generator](#pivot-table-generator)(New on version 1.1.0)
 
 	- [Controller Generator](#controller-generator)
 
@@ -29,7 +32,6 @@ A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5]
 - [Testing](#testing)
 
 - [Contributing](#contributing)
-
 
 ## Why ?
 
@@ -64,6 +66,7 @@ wn:controller               Generates RESTful controller using the RESTActions t
 wn:controller:rest-actions  Generates REST actions trait to use into controllers
 wn:migration                Generates a migration to create a table with schema
 wn:model                    Generates a model class for a RESTfull resource
+wn:pivot-table              Generates creation migration for a pivot table
 wn:resource                 Generates a model, migration, controller and routes for RESTful resource
 wn:resources                Generates multiple resources from a file
 wn:route                    Generates RESTful routes.
@@ -252,7 +255,7 @@ More then that, you can generate multiple resources with only one command ! [Cli
 The `wn:model` command is used to generate a model class based on Eloquent. It has the following syntax:
 
 ```
-wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--rules=...] [--path=...]
+wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--belongs-to-many=...] [--rules=...] [--path=...]
 ```
 
 - **name**: the name of the model. 
@@ -306,10 +309,10 @@ class Task extends Model {
 //...
 ```
 
-- **--has-one**, **--has-many** and **--belongs-to**: the relationships of the model following the syntax `relation1:model1,relation2:model2,...`. If the `model` is missing, it will be deducted from the relation's name. If the `model` is given without a namespace, it will be considered having the same namespace as the model being generated.
+- **--has-one**, **--has-many**, **--belongs-to** and **--belongs-to-many**: the relationships of the model following the syntax `relation1:model1,relation2:model2,...`. If the `model` is missing, it will be deducted from the relation's name. If the `model` is given without a namespace, it will be considered having the same namespace as the model being generated.
 
 ```
-php artisan wn:model Task --has-many=accounts --belongs-to="owner:App\User" --has-one=number:Phone --path=tests/tmp
+php artisan wn:model Task --has-many=accounts --belongs-to="owner:App\User" --has-one=number:Phone belongs-to-many=tags --path=tests/tmp
 ```
 gives:
 
@@ -317,17 +320,22 @@ gives:
 //...
 	public function accounts()
 	{
-		return $this->hasMany("Tests\\Tmp\\Account");
+		return $this->hasMany("Tests\Tmp\Account");
 	}
 
 	public function owner()
 	{
-		return $this->belongsTo("App\\User");
+		return $this->belongsTo("App\User");
 	}
 
 	public function number()
 	{
-		return $this->hasOne("Tests\\Tmp\\Phone");
+		return $this->hasOne("Tests\Tmp\Phone");
+	}
+
+	public function tags()
+	{
+		return $this->belongsToMany("Tests\Tmp\Tag")->withTimestamps();
 	}
 ```
 
@@ -410,6 +418,55 @@ $table->foreign('user_id')
     ->references('identifier')
     ->on('members')
     ->onDelete('cascade');
+```
+
+### Pivot Table Generator
+
+The `wn:pivot-table` command is used to generate a migration to create a pivot table between two models. It has the following syntax:
+
+```
+wn:pivot-table model1 model2 [--file=...]
+```
+
+- **model1** and **model2**: names of the two models (or the two tables if the models don't follow the naming conventions)
+
+- **--file**: The migration file name. By default the name follows the patern `date_time_create_table_name.php`.
+
+```
+php artisan wn:pivot-table Tag Project
+```
+gives:
+
+```php
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateProjectTagMigration extends Migration
+{
+    
+    public function up()
+    {
+        Schema::create('project_tag', function(Blueprint $table) {
+            $table->increments('id');
+            $table->integer('project_id')->unsigned()->index();
+            $table->integer('tag_id')->unsigned()->index();
+            $table->foreign('project_id')
+                ->references('id')
+                ->on('projects');
+            $table->foreign('tag_id')
+                ->references('id')
+                ->on('tags');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        Schema::drop('project_tag');
+    }
+}
 ```
 
 ### Controller Generator
@@ -498,7 +555,13 @@ The `wn:resource` command makes it very easy to generate a RESTful resource. It 
 
 ### Multiple Resources From File
 
-The `wn:resources` (note the "s" in "resources") command takes the generation process to an other level by parsing a file and generating multiple resources based on it. The syntax is `wn:resources filename`
+The `wn:resources` (note the "s" in "resources") command takes the generation process to an other level by parsing a file and generating multiple resources based on it. The syntax is 
+
+```
+wn:resources filename
+```
+
+This generator is smart enough to add foreign keys automatically when finding a belongsTo relation. It also generates pivot tables for belongsToMany relations automatically.
 
 The file given to the command should be a valid YAML file ( for the moment, support of other types like XML or JSON could be added in the future). An example is the following:
 
@@ -542,3 +605,4 @@ To test the generators, I included a fresh lumen installation under the folder `
 ## Contributing
 
 Pull requests are welcome :D
+

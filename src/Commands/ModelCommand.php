@@ -10,6 +10,7 @@ class ModelCommand extends BaseCommand {
         {--has-many= : hasMany relationships.}
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
+        {--belongs-to-many= : belongsToMany relationships.}
         {--rules= : fields validation rules.}
         {--path=app : where to store the model php file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}';
@@ -60,7 +61,8 @@ class ModelCommand extends BaseCommand {
         $relations = array_merge([], 
             $this->getRelationsByType('hasOne', 'has-one'),
             $this->getRelationsByType('hasMany', 'has-many'),
-            $this->getRelationsByType('belongsTo', 'belongs-to')
+            $this->getRelationsByType('belongsTo', 'belongs-to'),
+            $this->getRelationsByType('belongsToMany', 'belongs-to-many', true)
         );
 
         if(empty($relations)){
@@ -70,15 +72,16 @@ class ModelCommand extends BaseCommand {
         return implode(PHP_EOL, $relations);
     }
 
-    protected function getRelationsByType($type, $option)
+    protected function getRelationsByType($type, $option, $withTimestamps = false)
     {
         $relations = [];
         $option = $this->option($option);
         if($option){
-            
+
             $items = $this->getArgumentParser('relations')->parse($option);
             
-            $template = $this->getTemplate('model/relation');
+            $template = ($withTimestamps) ? 'model/relation-with-timestamps' : 'model/relation';
+            $template = $this->getTemplate($template);
             foreach ($items as $item) {
                 $item['type'] = $type;
                 if(! $item['model']){

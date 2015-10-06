@@ -14,6 +14,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerMigrationCommand();
         $this->registerResourceCommand();
         $this->registerResourcesCommand();
+        $this->registerPivotTableCommand();
         // $this->registerSeedCommand();
         // $this->registerTestCommand();
     }
@@ -87,6 +88,14 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ResourcesCommand'];
         });
         $this->commands('command.wn.resources');
+
+    }
+
+    protected function registerPivotTableCommand(){
+        $this->app->singleton('command.wn.pivot-table', function($app){
+            return $app['Wn\Generators\Commands\PivotTableCommand'];
+        });
+        $this->commands('command.wn.pivot-table');
 
     }
 

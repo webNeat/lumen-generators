@@ -10,6 +10,8 @@ class ResourcesCommand extends BaseCommand {
 
     protected $description = 'Generates multiple resources from a file';
 
+    protected $pivotTables = [];
+
     public function handle()
     {
         $content = $this->fs->get($this->argument('file'));
@@ -23,7 +25,22 @@ class ResourcesCommand extends BaseCommand {
                 'fields' => $i['fields'],
                 '--has-many' => $i['hasMany'],
                 '--has-one' => $i['hasOne'],
-                '--belongs-to' => $i['belongsTo']
+                '--belongs-to' => $i['belongsTo'],
+                '--belongs-to-many' => $i['belongsToMany']
+            ]);
+        }
+
+        $this->pivotTables = array_map(
+            'unserialize', 
+            array_unique(array_map('serialize', $this->pivotTables))
+        );
+
+        dd($this->pivotTables);
+
+        foreach ($this->pivotTables as $tables) {
+            $this->call('wn:pivot-table', [
+                'model1' => $tables[0],
+                'model2' => $tables[1]
             ]);
         }
     }
@@ -32,7 +49,7 @@ class ResourcesCommand extends BaseCommand {
     {
         $i['name'] = snake_case($modelName);
 
-        foreach(['hasMany', 'hasOne', 'belongsTo'] as $relation){
+        foreach(['hasMany', 'hasOne', 'belongsTo', 'belongsToMany'] as $relation){
             if(isset($i[$relation])){
                 $i[$relation] = $this->convertArray($i[$relation], ' ', ',');
             } else {
@@ -56,6 +73,24 @@ class ResourcesCommand extends BaseCommand {
                     'schema' => 'integer',
                     'tags' => 'key'
                 ];
+            }
+        }
+
+        if($i['belongsToMany']){
+            $relations = $this->getArgumentParser('relations')->parse($i['belongsToMany']);
+            foreach ($relations as $relation){
+                $table = '';
+                
+                if(! $relation['model']){
+                    $table = snake_case($relation['name']);
+                } else {
+                    $names = array_reverse(explode("\\", $relation['model']));
+                    $table = snake_case($names[0]); 
+                }
+
+                $tables = [ str_singular($table), $i['name'] ];
+                sort($tables);
+                $this->pivotTables[] = $tables;
             }
         }
 
