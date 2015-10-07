@@ -31,7 +31,7 @@ A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5]
 
 - [Testing](#testing)
 
-- [Development Notes](#development_notes)
+- [Development Notes](#development-notes)
 
 - [Contributing](#contributing)
 
