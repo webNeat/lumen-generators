@@ -7,7 +7,7 @@ class MigrationCommand extends BaseCommand {
         {table : The table name.}
         {--schema= : the schema.}
         {--keys= : foreign keys.}
-        {--file= : name of the migration file.}
+        {--file= : name of the migration file (to use only for testing purpose).}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         ';
         // {action : One of create, add, remove or drop options.}
@@ -31,7 +31,7 @@ class MigrationCommand extends BaseCommand {
 
         $file = $this->option('file');
         if(! $file){
-            $file = date('Y_m_d_His_') . snake_case($name);
+            $file = date('Y_m_d_His_') . snake_case($name) . '_table';
         }
 
         $this->save($content, "./database/migrations/{$file}.php");

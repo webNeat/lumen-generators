@@ -19,7 +19,7 @@ A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5]
 
 	- [Migration Generator](#migration-generator)
 
-	- [Pivot Table Generator](#pivot-table-generator)(New on version 1.1.0)
+	- [Pivot Table Generator](#pivot-table-generator) (Since version 1.1.0)
 
 	- [Controller Generator](#controller-generator)
 
@@ -30,6 +30,8 @@ A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5]
 	- [Multiple Resources From File](#multiple-resources-from-file)
 
 - [Testing](#testing)
+
+- [Development Notes](#development_notes)
 
 - [Contributing](#contributing)
 
@@ -365,7 +367,7 @@ wn:migration table [--schema=...] [--keys=...] [--file=...]
 
 - **table**: the name of the table to create.
 
-- **--file**: The migration file name. By default the name follows the patern `date_time_create_table_name.php`.
+- **--file**: The migration file name (to speicify only for testing purpose). By default the name follows the patern `date_time_create_tableName_table.php`.
 
 - **--schema**: the schema of the table using the syntax `field1:type.arg1,ag2:modifier1:modifier2.. field2:...`. The `type` could be `text`, `string.50`, `decimal.5,2` for example. Modifiers can be `unique` or `nullable` for example. [See documentation](http://laravel.com/docs/5.1/migrations#creating-columns) for the list of available types and modifiers.
 
@@ -601,6 +603,34 @@ Product:
 ## Testing
 
 To test the generators, I included a fresh lumen installation under the folder `lumen-test` to which I added this package and have written some acceptance tests using [Codeception](http://codeception.com/). To run tests you just have to execute the `install.sh` to install dependencies then execute `test.sh`.
+
+## Development Notes
+
+- **Version 1.0.0**
+
+	- Model Generator
+
+	- Migration Generator
+
+	- Controller Generator
+
+	- Routes Generator
+
+	- Resource Generator
+
+	- Multiple Resources From File
+
+- **Version 1.1.0**
+
+	- Pivot table generator added.
+
+	- belongsToMany relationship added to model generator.
+
+	- Multiple resources generator adds foreign keys for belongsTo relationships automatically.
+
+	- Multiple resources generator adds pivot tables for belongsToMany relationships automatically.
+
+	- Generated migrations file names changed to be supported by `migrate` command.
 
 ## Contributing
 

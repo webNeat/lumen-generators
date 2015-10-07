@@ -6,7 +6,7 @@ class PivotTableCommand extends BaseCommand {
 	protected $signature = 'wn:pivot-table
         {model1 : Name of the first model or table}
         {model2 : Name of the second model or table}
-        {--file= : name of the migration file.}
+        {--file= : name of the migration file (to use only for testing purpose).}
         ';
 
 	protected $description = 'Generates creation migration for a pivot table';
