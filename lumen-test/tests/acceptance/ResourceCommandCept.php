@@ -44,7 +44,7 @@ $I->seeInShellOutput('task_categories migration generated');
 $I->seeFileFound('./database/migrations/create_task_categories.php');
 $I->openFile('./database/migrations/create_task_categories.php');
 
-$I->seeInThisFile('class CreateTaskCategoriesMigration extends Migration');
+$I->seeInThisFile('class CreateTaskCategoriesTable extends Migration');
 $I->seeInThisFile('Schema::create(\'task_categories\', function(Blueprint $table) {
             $table->increments(\'id\');
             $table->string(\'name\')->unique();

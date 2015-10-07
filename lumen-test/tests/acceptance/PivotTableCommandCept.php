@@ -11,7 +11,7 @@ $I->seeFileContentsEqual('<?php
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProjectTagMigration extends Migration
+class CreateProjectTagTable extends Migration
 {
     
     public function up()

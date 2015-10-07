@@ -11,7 +11,7 @@ $I->seeFileContentsEqual('<?php
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTasksMigration extends Migration
+class CreateTasksTable extends Migration
 {
     
     public function up()
@@ -42,7 +42,7 @@ $I->seeFileContentsEqual('<?php
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTasksMigration extends Migration
+class CreateTasksTable extends Migration
 {
     
     public function up()
