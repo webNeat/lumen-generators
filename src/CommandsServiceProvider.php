@@ -15,6 +15,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerResourceCommand();
         $this->registerResourcesCommand();
         $this->registerPivotTableCommand();
+        $this->registerFactoryCommand();
         // $this->registerSeedCommand();
         // $this->registerTestCommand();
     }
@@ -24,7 +25,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ModelCommand'];
         });
         $this->commands('command.wn.model');
-
     }
 
     protected function registerControllerRestActionsCommand(){
@@ -32,7 +32,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ControllerRestActionsCommand'];
         });
         $this->commands('command.wn.controller.rest-actions');
-
     }
 
     protected function registerControllerCommand(){
@@ -40,7 +39,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ControllerCommand'];
         });
         $this->commands('command.wn.controller');
-
     }
 
     protected function registerMigrationCommand(){
@@ -48,7 +46,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\MigrationCommand'];
         });
         $this->commands('command.wn.migration');
-
     }
 
     protected function registerSeedCommand(){
@@ -56,7 +53,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\SeedCommand'];
         });
         $this->commands('command.wn.seed');
-
     }
 
     protected function registerRouteCommand(){
@@ -64,7 +60,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\RouteCommand'];
         });
         $this->commands('command.wn.route');
-
     }
 
     protected function registerTestCommand(){
@@ -72,7 +67,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\TestCommand'];
         });
         $this->commands('command.wn.test');
-
     }
 
     protected function registerResourceCommand(){
@@ -80,7 +74,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ResourceCommand'];
         });
         $this->commands('command.wn.resource');
-
     }
 
     protected function registerResourcesCommand(){
@@ -88,7 +81,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\ResourcesCommand'];
         });
         $this->commands('command.wn.resources');
-
     }
 
     protected function registerPivotTableCommand(){
@@ -96,7 +88,13 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\PivotTableCommand'];
         });
         $this->commands('command.wn.pivot-table');
+    }
 
+    protected function registerFactoryCommand(){
+        $this->app->singleton('command.wn.factory', function($app){
+            return $app['Wn\Generators\Commands\FactoryCommand'];
+        });
+        $this->commands('command.wn.factory');
     }
 
 }
