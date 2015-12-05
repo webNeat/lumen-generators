@@ -1,0 +1,11 @@
+<?php
+
+use Illuminate\Database\Seeder;
+
+class {{name}} extends Seeder
+{
+    public function run()
+    {
+        factory({{model}}::class, {{count}})->create();
+    }
+}

@@ -28,7 +28,12 @@
 		        }
         	},
         	"rules",
-        	"tags[]"
+        	"tags[]",
+        	{
+        		"name": "factory",
+        		"type": "string",
+        		"default": false
+        	}
         ]
     }
 }

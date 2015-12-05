@@ -30,12 +30,12 @@ class ResourcesCommand extends BaseCommand {
             ]);
         }
 
+        $this->call('migrate');
+
         $this->pivotTables = array_map(
             'unserialize', 
             array_unique(array_map('serialize', $this->pivotTables))
         );
-
-        dd($this->pivotTables);
 
         foreach ($this->pivotTables as $tables) {
             $this->call('wn:pivot-table', [
@@ -43,6 +43,8 @@ class ResourcesCommand extends BaseCommand {
                 'model2' => $tables[1]
             ]);
         }
+
+        $this->call('migrate');
     }
 
     protected function getResourceParams($modelName, $i)
@@ -111,7 +113,13 @@ class ResourcesCommand extends BaseCommand {
         $rules = (isset($field['rules'])) ? trim($field['rules']) : '';
         $tags = $this->convertArray($field['tags'], ' ', ',');
 
-        return "{$name};{$schema};{$rules};{$tags}";
+        $string = "{$name};{$schema};{$rules};{$tags}";
+
+        if($field['factory']){
+            $string .= ';' . $field['factory'];
+        }
+
+        return $string;
     }
 
     protected function convertArray($list, $old, $new)

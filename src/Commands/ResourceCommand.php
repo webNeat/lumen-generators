@@ -49,7 +49,7 @@ class ResourceCommand extends BaseCommand {
             '--parsed' => true
         ]);
         
-        // generation REST actions trait if doesn't exist
+        // generating REST actions trait if doesn't exist
         if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
             $this->call('wn:controller:rest-actions');
         }
@@ -58,6 +58,13 @@ class ResourceCommand extends BaseCommand {
         $this->call('wn:controller', [
             'model' => $modelName,
             '--no-routes' => false
+        ]);
+
+        // generating model factory
+        $this->call('wn:factory', [
+            'model' => 'App\\' . $modelName,
+            '--fields' => $this->factoryFields(),
+            '--parsed' => true
         ]);
 
     }
@@ -118,6 +125,18 @@ class ResourceCommand extends BaseCommand {
             ];
         }, array_filter($this->fields, function($field){
             return in_array('key', $field['tags']);
+        }));
+    }
+
+    protected function factoryFields()
+    {
+        return array_map(function($field){
+            return [
+                'name' => $field['name'],
+                'type' => $field['factory']
+            ];
+        }, array_filter($this->fields, function($field){
+            return isset($field['factory']) && $field['factory'];
         }));
     }
 

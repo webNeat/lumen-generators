@@ -1,0 +1,1 @@
+$this->call({{name}}::class);

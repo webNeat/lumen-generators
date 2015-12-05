@@ -1,13 +1,12 @@
 <?php namespace Wn\Generators\Commands;
 
 
-class FactoryCommand extends BaseCommand {
+class SeederCommand extends BaseCommand {
 
-	protected $signature = 'wn:factory
+	protected $signature = 'wn:seeder
         {model : full qualified name of the model.}
-        {--fields= : the fields to generate.}
-        {--file= : the factories file.}
-        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}';
+        {--cout=10 : number of elements to add in database.}
+    ';
 
 	protected $description = 'Generates a model factory';
 

@@ -3,3 +3,6 @@
 *.sublime-*
 
 tests/_output/*
+
+lumen-test/app/
+lumen-test/database/
