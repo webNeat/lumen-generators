@@ -632,6 +632,10 @@ To test the generators, I included a fresh lumen installation under the folder `
 
 	- Generated migrations file names changed to be supported by `migrate` command.
 
+- **Version 1.1.1**
+
+	- Pivot table generation from the `wn:resources` command bug fixed.
+
 ## Contributing
 
 Pull requests are welcome :D
