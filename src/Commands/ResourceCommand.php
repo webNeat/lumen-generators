@@ -66,6 +66,9 @@ class ResourceCommand extends BaseCommand {
         //     '--fields' => $this->factoryFields(),
         //     '--parsed' => true
         // ]);
+        // 
+        // generating table seeder
+        // ...
 
     }
 

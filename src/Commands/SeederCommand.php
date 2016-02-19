@@ -5,60 +5,37 @@ class SeederCommand extends BaseCommand {
 
 	protected $signature = 'wn:seeder
         {model : full qualified name of the model.}
-        {--cout=10 : number of elements to add in database.}
+        {--count=10 : number of elements to add in database.}
     ';
 
-	protected $description = 'Generates a model factory';
+	protected $description = 'Generates a seeder';
 
     public function handle()
     {
         $model = $this->argument('model');
+        $name = $this->getSeederName($model);
+        $file = "./database/seeds/{$name}.php";
 
-        $file = $this->getFile();
-
-        $content = $this->fs->get($file);
-
-        $content .= $this->getTemplate('factory')
+        $content = $this->getTemplate('seeder')
             ->with([
                 'model' => $model,
-                'factory_fields' => $this->getFieldsContent()
+                'name' => $name,
+                'count' => $this->option('count')
             ])
             ->get();
 
+
         $this->save($content, $file);
 
-        $this->info("{$model} factory generated !");
+        $this->info("{$name} generated !");
     }
 
-    protected function getFile()
+    protected function getSeederName($name)
     {
-        $file = $this->option('file');
-        if(! $file){
-            $file = './database/factories/ModelFactory.php';
-        }
-        return $file;
+        $name = explode("\\", $name);
+        $name = ucwords(str_plural($name[count($name) - 1]));
+        $name = $name . 'TableSeeder';
+        return $name;
     }
 
-    protected function getFieldsContent()
-    {
-        $content = [];
-
-        $fields = $this->option('fields');
-
-        if($fields){
-            if(! $this->option('parsed')){
-                $fields = $this->getArgumentParser('factory-fields')->parse($fields);
-            }
-            $template = $this->getTemplate('factory/field');
-            foreach($fields as $field){
-                $content[] = $template->with($field)->get();
-            }
-            $content = implode(PHP_EOL, $content);
-        } else {
-            $content = "\t\t// Fields here";
-        }
-
-        return $content;
-    }
-    
 }

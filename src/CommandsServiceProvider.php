@@ -16,7 +16,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerResourcesCommand();
         $this->registerPivotTableCommand();
         $this->registerFactoryCommand();
-        // $this->registerSeedCommand();
+        $this->registerSeederCommand();
         // $this->registerTestCommand();
     }
 
@@ -48,11 +48,11 @@ class CommandsServiceProvider extends ServiceProvider
         $this->commands('command.wn.migration');
     }
 
-    protected function registerSeedCommand(){
-        $this->app->singleton('command.wn.seed', function($app){
-            return $app['Wn\Generators\Commands\SeedCommand'];
+    protected function registerSeederCommand(){
+        $this->app->singleton('command.wn.seeder', function($app){
+            return $app['Wn\Generators\Commands\SeederCommand'];
         });
-        $this->commands('command.wn.seed');
+        $this->commands('command.wn.seeder');
     }
 
     protected function registerRouteCommand(){
