@@ -3,7 +3,7 @@ $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a seeder with default options');
 $I->runShellCommand('php artisan wn:seeder "App\Task"');
-$I->seeInShellOutput('TaskSeeder generated');
+$I->seeInShellOutput('TasksTableSeeder generated');
 $I->openFile('./database/seeds/TasksTableSeeder.php');
 $I->seeInThisFile('
 use Illuminate\Database\Seeder;
@@ -28,7 +28,7 @@ class CategoriesTableSeeder extends Seeder
 {
     public function run()
     {
-        factory(App\Task::class, 25)->create();
+        factory(App\Category::class, 25)->create();
     }
 }');
 $I->deleteFile('./database/seeds/CategoriesTableSeeder.php');
