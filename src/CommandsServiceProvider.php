@@ -17,6 +17,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerPivotTableCommand();
         $this->registerFactoryCommand();
         $this->registerSeederCommand();
+        $this->registerPivotSeederCommand();
         // $this->registerTestCommand();
     }
 
@@ -46,13 +47,6 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\MigrationCommand'];
         });
         $this->commands('command.wn.migration');
-    }
-
-    protected function registerSeederCommand(){
-        $this->app->singleton('command.wn.seeder', function($app){
-            return $app['Wn\Generators\Commands\SeederCommand'];
-        });
-        $this->commands('command.wn.seeder');
     }
 
     protected function registerRouteCommand(){
@@ -95,6 +89,20 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\FactoryCommand'];
         });
         $this->commands('command.wn.factory');
+    }
+
+    protected function registerSeederCommand(){
+        $this->app->singleton('command.wn.seeder', function($app){
+            return $app['Wn\Generators\Commands\SeederCommand'];
+        });
+        $this->commands('command.wn.seeder');
+    }
+
+    protected function registerPivotSeederCommand(){
+        $this->app->singleton('command.wn.pivot.seeder', function($app){
+            return $app['Wn\Generators\Commands\PivotSeederCommand'];
+        });
+        $this->commands('command.wn.pivot.seeder');
     }
 
 }

@@ -105,37 +105,51 @@ $app->get("/", function () use ($app) {
 ');
 
 // Checking model factory
-// $I->openFile('./database/factories/ModelFactory.php');
-// $I->seeInThisFile("
-// /**
-//  * Factory definition for model App\TaskCategory.
-//  */
-// \$factory->define(App\TaskCategory::class, function (\$faker) {
-//     return [
-// 		'name' => \$faker->word,
-// 		'descr' => \$faker->paragraph,
-// 		'due' => \$faker->date,
-//     ];
-// });");
-// $I->writeToFile('./database/factories/ModelFactory.php', "<?php
+$I->openFile('./database/factories/ModelFactory.php');
+$I->seeInThisFile("
+/**
+ * Factory definition for model App\TaskCategory.
+ */
+\$factory->define(App\TaskCategory::class, function (\$faker) {
+    return [
+		'name' => \$faker->word,
+		'descr' => \$faker->paragraph,
+		'due' => \$faker->date,
+    ];
+});");
+$I->writeToFile('./database/factories/ModelFactory.php', "<?php
 
-// /*
-// |--------------------------------------------------------------------------
-// | Model Factories
-// |--------------------------------------------------------------------------
-// |
-// | Here you may define all of your model factories. Model factories give
-// | you a convenient way to create models for testing and seeding your
-// | database. Just tell the factory how a default model should look.
-// |
-// */
+/*
+|--------------------------------------------------------------------------
+| Model Factories
+|--------------------------------------------------------------------------
+|
+| Here you may define all of your model factories. Model factories give
+| you a convenient way to create models for testing and seeding your
+| database. Just tell the factory how a default model should look.
+|
+*/
 
-// \$factory->define(App\User::class, function (\$faker) {
-//     return [
-//         'name' => \$faker->name,
-//         'email' => \$faker->email,
-//         'password' => str_random(10),
-//         'remember_token' => str_random(10),
-//     ];
-// });
-// ");
+\$factory->define(App\User::class, function (\$faker) {
+    return [
+        'name' => \$faker->name,
+        'email' => \$faker->email,
+        'password' => str_random(10),
+        'remember_token' => str_random(10),
+    ];
+});
+");
+
+// Checking database seeder
+$I->openFile('./database/seeds/TaskCategoriesTableSeeder.php');
+$I->seeInThisFile('
+use Illuminate\Database\Seeder;
+
+class TaskCategoriesTableSeeder extends Seeder
+{
+    public function run()
+    {
+        factory(App\TaskCategory::class, 10)->create();
+    }
+}');
+$I->deleteFile('./database/seeds/TaskCategoriesTableSeeder.php');

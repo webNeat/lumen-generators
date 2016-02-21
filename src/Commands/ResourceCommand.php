@@ -61,11 +61,16 @@ class ResourceCommand extends BaseCommand {
         ]);
 
         // generating model factory
-        /*$this->call('wn:factory', [
+        $this->call('wn:factory', [
             'model' => 'App\\' . $modelName,
             '--fields' => $this->factoryFields(),
             '--parsed' => true
-        ]);*/
+        ]);
+
+        // generating database seeder
+        $this->call('wn:seeder', [
+            'model' => 'App\\' . $modelName
+        ]);
 
     }
 

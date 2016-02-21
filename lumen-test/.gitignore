@@ -4,6 +4,3 @@
 tests/_output/*
 
 composer.lock
-
-lumen-test/app
-lumen-test/database
