@@ -42,6 +42,11 @@ class ResourcesCommand extends BaseCommand {
                 'model1' => $tables[0],
                 'model2' => $tables[1]
             ]);
+
+            $this->call('wn:pivot-seeder', [
+                'model1' => $tables[0],
+                'model2' => $tables[1]
+            ]);
         }
 
         $this->call('migrate');
