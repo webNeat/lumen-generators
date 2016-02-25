@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a RESTful resource');
-$I->runShellCommand('php artisan wn:resource task_category "name;string:unique;requied;fillable;word descr;text:nullable;;fillable;paragraph project_id;integer;required;key,fillable due;timestamp;;fillable,date;date" --has-many="tags,tasks" --belongs-to="project,creator:User" --migration-file=create_task_categories');
+$I->runShellCommand('php artisan wn:resource task_category "name;string:unique;requied;fillable;word descr;text:nullable;;fillable;paragraph due;timestamp;;fillable,date;date" --has-many="tags,tasks" --belongs-to="project,creator:User" --migration-file=create_task_categories');
 
 // Checking the model
 $I->seeInShellOutput('TaskCategory model generated');
@@ -11,11 +11,12 @@ $I->openFile('./app/TaskCategory.php');
 
 $I->seeInThisFile('namespace App;');
 $I->seeInThisFile('class TaskCategory extends Model');
-$I->seeInThisFile('protected $fillable = ["name", "descr", "project_id", "due"];');
+$I->seeInThisFile('protected $fillable = ["name", "descr", "due", "project_id", "user_id"];');
 $I->seeInThisFile('protected $dates = ["due"];');
 $I->seeInThisFile('public static $rules = [
 		"name" => "requied",
-		"project_id" => "required",
+		"project_id" => "required|numeric",
+		"user_id" => "required|numeric",
 	];');
 $I->seeInThisFile('
 	public function tags()
@@ -49,11 +50,15 @@ $I->seeInThisFile('Schema::create(\'task_categories\', function(Blueprint $table
             $table->increments(\'id\');
             $table->string(\'name\')->unique();
             $table->text(\'descr\')->nullable();
-            $table->integer(\'project_id\');
             $table->timestamp(\'due\');
+            $table->integer(\'project_id\')->unsigned();
+            $table->integer(\'user_id\')->unsigned();
             $table->foreign(\'project_id\')
                 ->references(\'id\')
                 ->on(\'projects\');
+            $table->foreign(\'user_id\')
+                ->references(\'id\')
+                ->on(\'users\');
             $table->timestamps();
         });');
 
@@ -106,17 +111,17 @@ $app->get("/", function () use ($app) {
 
 // Checking model factory
 $I->openFile('./database/factories/ModelFactory.php');
-$I->seeInThisFile("
-/**
- * Factory definition for model App\TaskCategory.
- */
-\$factory->define(App\TaskCategory::class, function (\$faker) {
-    return [
-		'name' => \$faker->word,
-		'descr' => \$faker->paragraph,
-		'due' => \$faker->date,
-    ];
-});");
+// $I->seeInThisFile("
+// /**
+//  * Factory definition for model App\TaskCategory.
+//  */
+// \$factory->define(App\TaskCategory::class, function (\$faker) {
+//     return [
+// 		'name' => \$faker->word,
+// 		'descr' => \$faker->paragraph,
+// 		'due' => \$faker->date,
+//     ];
+// });");
 $I->writeToFile('./database/factories/ModelFactory.php', "<?php
 
 /*

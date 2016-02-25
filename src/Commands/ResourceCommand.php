@@ -44,7 +44,7 @@ class ResourceCommand extends BaseCommand {
         $this->call('wn:migration', [
             'table' => $tableName,
             '--schema' => $this->schema(),
-            '--keys' => $this->foreignKeys(),
+            '--keys' => $this->migrationKeys(),
             '--file' => $this->option('migration-file'),
             '--parsed' => true
         ]);
@@ -79,12 +79,27 @@ class ResourceCommand extends BaseCommand {
         $fields = $this->argument('fields');
         if($this->option('parsed')){
             $this->fields = $fields;
-        } else if(! $fields){
-            $this->fields = [];
         } else {
-            $this->fields = $this->getArgumentParser('fields')
-                ->parse($fields);
-        }
+            if(! $fields){
+                $this->fields = [];
+            } else {
+                $this->fields = $this->getArgumentParser('fields')
+                    ->parse($fields);
+            }
+            $this->fields = array_merge($this->fields, array_map(function($name) {
+                return [
+                    'name' => $name,
+                    'schema' => [
+                        ['name' => 'integer', 'args' => []],
+                        ['name' => 'unsigned', 'args' => []]
+                    ],
+                    'rules' => 'required|numeric',
+                    'tags' => ['fillable', 'key'],
+                    'factory' => 'key' 
+                ];
+            }, $this->foreignKeys()));
+        } 
+
     }
     
     protected function fieldsHavingTag($tag)
@@ -120,17 +135,31 @@ class ResourceCommand extends BaseCommand {
 
     protected function foreignKeys()
     {
-        return array_map(function($field){
+        $belongsTo = $this->option('belongs-to');
+        if(! $belongsTo) {
+            return [];
+        }
+        $relations = $this->getArgumentParser('relations')->parse($belongsTo);
+        return array_map(function($relation){
+            $name = $relation['model'] ? $relation['model'] : $relation['name'];
+            $index = strrpos($name, "\\");
+            if($index) {
+                $name = substr($name, $index + 1);
+            }
+            return snake_case(str_singular($name)) . '_id';
+        }, $relations);
+    }
+
+    protected function migrationKeys() {
+        return array_map(function($name) {
             return [
-                'name' => $field['name'],
+                'name' => $name,
                 'column' => '',
                 'table' => '',
                 'on_delete' => '',
                 'on_update' => ''
             ];
-        }, array_filter($this->fields, function($field){
-            return in_array('key', $field['tags']);
-        }));
+        }, $this->foreignKeys());
     }
 
     protected function factoryFields()
