@@ -2,8 +2,8 @@
 
 class {{name}} extends Controller
 {
-	const MODEL = "{{model}}";
+    const MODEL = "{{model}}";
 
-	use RESTActions;
+    use RESTActions;
 
 }

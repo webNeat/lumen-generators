@@ -4,13 +4,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class {{name}} extends Model
 {
-	protected $fillable = [{{fillable}}];
+    protected $fillable = [{{fillable}}];
 
-	protected $dates = [{{dates}}];
+    protected $dates = [{{dates}}];
 
-	public static $rules = [
+    public static $rules = [
 {{rules}}
-	];
+    ];
 
 {{relations}}
 
