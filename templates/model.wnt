@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class {{name}} extends Model {
-
+class {{name}} extends Model
+{
 	protected $fillable = [{{fillable}}];
 
 	protected $dates = [{{dates}}];

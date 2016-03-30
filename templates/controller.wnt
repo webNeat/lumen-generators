@@ -1,8 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-
-class {{name}} extends Controller {
-
+class {{name}} extends Controller
+{
 	const MODEL = "{{model}}";
 
 	use RESTActions;
