@@ -1,4 +1,4 @@
-	public function {{name}}()
-	{
-		return $this->{{type}}("{{model}}")->withTimestamps();
-	}
+    public function {{name}}()
+    {
+        return $this->{{type}}("{{model}}")->withTimestamps();
+    }
