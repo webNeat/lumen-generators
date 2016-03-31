@@ -2,15 +2,15 @@
 
 use Illuminate\Database\Eloquent\Model;
 
-class {{name}} extends Model
-{
-    protected $fillable = [{{fillable}}];
+class {{name}} extends Model {
 
-    protected $dates = [{{dates}}];
+	protected $fillable = [{{fillable}}];
 
-    public static $rules = [
+	protected $dates = [{{dates}}];
+
+	public static $rules = [
 {{rules}}
-    ];
+	];
 
 {{relations}}
 

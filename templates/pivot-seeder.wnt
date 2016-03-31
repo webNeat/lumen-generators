@@ -7,16 +7,16 @@ class {{name}} extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
+    	$faker = Faker::create();
 
-        $firstIds = DB::table('{{first_table}}')->lists('id');
-        $secondIds = DB::table('{{second_table}}')->lists('id');
+    	$firstIds = DB::table('{{first_table}}')->lists('id');
+    	$secondIds = DB::table('{{second_table}}')->lists('id');
 
         for($i = 0; $i < {{count}}; $i++) {
-            DB::table('{{first_resource}}_{{second_resource}}')->insert([
-                '{{first_resource}}_id' => $faker->randomElement($firstIds),
-                '{{second_resource}}_id' => $faker->randomElement($secondIds)
-            ]);
+        	DB::table('{{first_resource}}_{{second_resource}}')->insert([
+        		'{{first_resource}}_id' => $faker->randomElement($firstIds),
+        		'{{second_resource}}_id' => $faker->randomElement($secondIds)
+        	]);
         }
     }
 }
