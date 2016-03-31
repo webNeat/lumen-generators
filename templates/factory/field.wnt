@@ -1,1 +1,1 @@
-        '{{name}}' => $faker->{{type}},
+		'{{name}}' => $faker->{{type}},
