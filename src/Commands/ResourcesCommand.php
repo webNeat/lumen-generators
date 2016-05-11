@@ -77,7 +77,7 @@ class ResourcesCommand extends BaseCommand {
                 }
 
                 $i['fields'][$foreignName] = [
-                    'schema' => 'integer',
+                    'schema' => 'integer unsigned',
                     'tags' => 'key'
                 ];
             }
