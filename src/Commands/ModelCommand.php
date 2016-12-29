@@ -55,10 +55,10 @@ class ModelCommand extends BaseCommand {
     {
     	return str_replace(' ', '\\', ucwords(str_replace('/', ' ', $this->option('path'))));
     }
-	
+
     protected function getRelations()
     {
-        $relations = array_merge([], 
+        $relations = array_merge([],
             $this->getRelationsByType('hasOne', 'has-one'),
             $this->getRelationsByType('hasMany', 'has-many'),
             $this->getRelationsByType('belongsTo', 'belongs-to'),
@@ -66,7 +66,7 @@ class ModelCommand extends BaseCommand {
         );
 
         if(empty($relations)){
-            return "\t// Relationships";
+            return "    // Relationships";
         }
 
         return implode(PHP_EOL, $relations);
@@ -79,7 +79,7 @@ class ModelCommand extends BaseCommand {
         if($option){
 
             $items = $this->getArgumentParser('relations')->parse($option);
-            
+
             $template = ($withTimestamps) ? 'model/relation-with-timestamps' : 'model/relation';
             $template = $this->getTemplate($template);
             foreach ($items as $item) {
@@ -99,7 +99,7 @@ class ModelCommand extends BaseCommand {
     {
         $rules = $this->option('rules');
         if(! $rules){
-            return "\t\t// Validation rules";
+            return "        // Validation rules";
         }
         $items = $rules;
         if(! $this->option('parsed')){
@@ -113,5 +113,5 @@ class ModelCommand extends BaseCommand {
 
         return implode(PHP_EOL, $rules);
     }
-    
+
 }

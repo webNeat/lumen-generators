@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a migration without schema');
@@ -13,7 +13,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTasksTable extends Migration
 {
-    
+
     public function up()
     {
         Schema::create(\'tasks\', function(Blueprint $table) {
@@ -44,7 +44,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateTasksTable extends Migration
 {
-    
+
     public function up()
     {
         Schema::create(\'tasks\', function(Blueprint $table) {
@@ -72,8 +72,8 @@ $I->openFile('./database/migrations/create_tasks.php');
 $I->seeInThisFile('$table->foreign(\'category_type_id\')
                 ->references(\'id\')
                 ->on(\'category_types\');');
-$I->seeInThisFile('$table->foreign(\'user_id\')
-                ->references(\'identifier\')
-                ->on(\'members\')
-                ->onDelete(\'cascade\');');
+$I->seeInThisFile("\$table->foreign('user_id')
+                ->references('identifier')
+                ->on('members')
+                ->onDelete('cascade');");
 $I->deleteFile('./database/migrations/create_tasks.php');

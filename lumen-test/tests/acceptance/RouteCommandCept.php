@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate RESTful routes for a resource with default controller');

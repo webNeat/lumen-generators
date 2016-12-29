@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a pivot table');
@@ -13,7 +13,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateProjectTagTable extends Migration
 {
-    
+
     public function up()
     {
         Schema::create(\'project_tag\', function(Blueprint $table) {

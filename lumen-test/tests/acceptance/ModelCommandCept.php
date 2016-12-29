@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a model without fillable fields or dates');
@@ -13,15 +13,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestingModel extends Model {
 
-	protected $fillable = [];
+    protected $fillable = [];
 
-	protected $dates = [];
+    protected $dates = [];
 
-	public static $rules = [
-		// Validation rules
-	];
+    public static $rules = [
+        // Validation rules
+    ];
 
-	// Relationships
+    // Relationships
 
 }
 ');
@@ -43,22 +43,22 @@ $I->runShellCommand('php artisan wn:model TestingModel --has-many=accounts --bel
 $I->seeFileFound('./tests/tmp/TestingModel.php');
 $I->openFile('./tests/tmp/TestingModel.php');
 $I->seeInThisFile('
-	public function accounts()
-	{
-		return $this->hasMany("Tests\\Tmp\\Account");
-	}
+    public function accounts()
+    {
+        return $this->hasMany("Tests\\Tmp\\Account");
+    }
 ');
 $I->seeInThisFile('
-	public function owner()
-	{
-		return $this->belongsTo("App\\User");
-	}
+    public function owner()
+    {
+        return $this->belongsTo("App\\User");
+    }
 ');
 $I->seeInThisFile('
-	public function number()
-	{
-		return $this->hasOne("Tests\\Tmp\\Phone");
-	}
+    public function number()
+    {
+        return $this->hasOne("Tests\\Tmp\\Phone");
+    }
 ');
 
 $I->wantTo('generate a model with validation rules');
@@ -66,11 +66,11 @@ $I->runShellCommand('php artisan wn:model TestingModel --rules="name=required ag
 $I->seeFileFound('./tests/tmp/TestingModel.php');
 $I->openFile('./tests/tmp/TestingModel.php');
 $I->seeInThisFile('
-	public static $rules = [
-		"name" => "required",
-		"age" => "integer|min:13",
-		"email" => "email|unique:users,email_address",
-	];
+    public static $rules = [
+        "name" => "required",
+        "age" => "integer|min:13",
+        "email" => "email|unique:users,email_address",
+    ];
 ');
 
 $I->deleteFile('./tests/tmp/TestingModel.php');

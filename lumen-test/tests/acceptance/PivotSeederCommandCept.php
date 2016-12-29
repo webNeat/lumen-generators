@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a pivot table seeder');
@@ -13,16 +13,16 @@ class ShortTagTaskTableSeeder extends Seeder
 {
     public function run()
     {
-    	\$faker = Faker::create();
+        \$faker = Faker::create();
 
-    	\$firstIds = DB::table('short_tags')->lists('id');
-    	\$secondIds = DB::table('tasks')->lists('id');
+        \$firstIds = DB::table('short_tags')->lists('id');
+        \$secondIds = DB::table('tasks')->lists('id');
 
         for(\$i = 0; \$i < 10; \$i++) {
-        	DB::table('short_tag_task')->insert([
-        		'short_tag_id' => \$faker->randomElement(\$firstIds),
-        		'task_id' => \$faker->randomElement(\$secondIds)
-        	]);
+            DB::table('short_tag_task')->insert([
+                'short_tag_id' => \$faker->randomElement(\$firstIds),
+                'task_id' => \$faker->randomElement(\$secondIds)
+            ]);
         }
     }
 }");

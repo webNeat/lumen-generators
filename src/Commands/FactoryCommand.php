@@ -56,10 +56,10 @@ class FactoryCommand extends BaseCommand {
             }
             $content = implode(PHP_EOL, $content);
         } else {
-            $content = "\t\t// Fields here";
+            $content = "        // Fields here";
         }
 
         return $content;
     }
-    
+
 }

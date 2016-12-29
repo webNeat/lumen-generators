@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate model factories without fields');
@@ -8,7 +8,7 @@ $I->openFile('./database/factories/ModelFactory.php');
 $I->seeInThisFile('
 $factory->define(App\Task::class, function ($faker) {
     return [
-		// Fields here
+        // Fields here
     ];
 });');
 $I->writeToFile('./database/factories/ModelFactory.php', "<?php
@@ -39,10 +39,10 @@ $I->runShellCommand('php artisan wn:factory "App\Task" --fields="title:sentence(
 $I->seeInShellOutput('App\Task factory generated');
 $I->openFile('./database/factories/ModelFactory.php');
 $I->seeInThisFile("
-		'title' => \$faker->sentence(3),
-		'description' => \$faker->paragraph(3),
-		'due' => \$faker->date,
-		'hidden' => \$faker->boolean,
+        'title' => \$faker->sentence(3),
+        'description' => \$faker->paragraph(3),
+        'due' => \$faker->date,
+        'hidden' => \$faker->boolean,
 ");
 $I->writeToFile('./database/factories/ModelFactory.php', "<?php
 
