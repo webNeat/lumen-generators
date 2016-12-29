@@ -1,4 +1,4 @@
-<?php 
+<?php
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a RESTful resource');
@@ -14,30 +14,30 @@ $I->seeInThisFile('class TaskCategory extends Model');
 $I->seeInThisFile('protected $fillable = ["name", "descr", "due", "project_id", "user_id"];');
 $I->seeInThisFile('protected $dates = ["due"];');
 $I->seeInThisFile('public static $rules = [
-		"name" => "requied",
-		"project_id" => "required|numeric",
-		"user_id" => "required|numeric",
-	];');
+        "name" => "requied",
+        "project_id" => "required|numeric",
+        "user_id" => "required|numeric",
+    ];');
 $I->seeInThisFile('
-	public function tags()
-	{
-		return $this->hasMany("App\Tag");
-	}
+    public function tags()
+    {
+        return $this->hasMany("App\Tag");
+    }
 
-	public function tasks()
-	{
-		return $this->hasMany("App\Task");
-	}
+    public function tasks()
+    {
+        return $this->hasMany("App\Task");
+    }
 
-	public function project()
-	{
-		return $this->belongsTo("App\Project");
-	}
+    public function project()
+    {
+        return $this->belongsTo("App\Project");
+    }
 
-	public function creator()
-	{
-		return $this->belongsTo("App\User");
-	}');
+    public function creator()
+    {
+        return $this->belongsTo("App\User");
+    }');
 $I->deleteFile('./app/TaskCategory.php');
 
 // Checking the migration
@@ -75,9 +75,9 @@ $I->openFile('./app/Http/Controllers/TaskCategoriesController.php');
 
 $I->seeInThisFile('class TaskCategoriesController extends Controller {
 
-	const MODEL = "App\TaskCategory";
+    const MODEL = "App\TaskCategory";
 
-	use RESTActions;
+    use RESTActions;
 
 }');
 
@@ -117,9 +117,9 @@ $I->openFile('./database/factories/ModelFactory.php');
 //  */
 // \$factory->define(App\TaskCategory::class, function (\$faker) {
 //     return [
-// 		'name' => \$faker->word,
-// 		'descr' => \$faker->paragraph,
-// 		'due' => \$faker->date,
+//      'name' => \$faker->word,
+//      'descr' => \$faker->paragraph,
+//      'due' => \$faker->date,
 //     ];
 // });");
 $I->writeToFile('./database/factories/ModelFactory.php', "<?php

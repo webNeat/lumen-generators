@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class {{name}}Table extends Migration
 {
-    
+
     public function up()
     {
         Schema::create('{{table}}', function(Blueprint $table) {
