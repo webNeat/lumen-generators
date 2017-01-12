@@ -7,6 +7,7 @@ class PivotSeederCommand extends BaseCommand {
         {model1 : Name of the first model or table}
         {model2 : Name of the second model or table}
         {--count=10 : number of elements to add in database.}
+        {--force= : override the existing files}
     ';
 
 	protected $description = 'Generates seeder for pivot table';
@@ -29,9 +30,7 @@ class PivotSeederCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, $file);
-
-        $this->info("{$name} generated !");
+        $this->save($content, $file, $name);
     }
 
     protected function getResources()
@@ -39,7 +38,7 @@ class PivotSeederCommand extends BaseCommand {
         $resources = array_map(function($arg) {
             return snake_case(str_singular($this->argument($arg)));
         }, ['model1', 'model2']);
-        
+
         sort($resources);
 
         return $resources;

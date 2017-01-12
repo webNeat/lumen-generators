@@ -6,10 +6,12 @@ class MigrationCommand extends BaseCommand {
 	protected $signature = 'wn:migration
         {table : The table name.}
         {--schema= : the schema.}
+        {--add= : specifies additional columns like softDeletes, rememberToken and nullableTimestamps.}
         {--keys= : foreign keys.}
         {--file= : name of the migration file (to use only for testing purpose).}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
-        ';
+        {--force= : override the existing files}
+    ';
         // {action : One of create, add, remove or drop options.}
         // The action is only create for the moment
 
@@ -25,6 +27,7 @@ class MigrationCommand extends BaseCommand {
                 'table' => $table,
                 'name' => $name,
                 'schema' => $this->getSchema(),
+                'additionals' => $this->getAdditionals(),
                 'constraints' => $this->getConstraints()
             ])
             ->get();
@@ -34,16 +37,14 @@ class MigrationCommand extends BaseCommand {
             $file = date('Y_m_d_His_') . snake_case($name) . '_table';
         }
 
-        $this->save($content, "./database/migrations/{$file}.php");
-
-        $this->info("{$table} migration generated !");
+        $this->save($content, "./database/migrations/{$file}.php", "{$table} migration");
     }
 
     protected function getSchema()
     {
         $schema = $this->option('schema');
         if(! $schema){
-            return "            // Schema declaration";
+            return $this->spaces(12) . "// Schema declaration";
         }
 
         $items = $schema;
@@ -57,6 +58,23 @@ class MigrationCommand extends BaseCommand {
         }
 
         return implode(PHP_EOL, $fields);
+    }
+
+    protected function getAdditionals()
+    {
+        $additionals = $this->option('add');
+        if (empty($additionals)) {
+            $additionals = 'timestamps';
+        }
+
+        $additionals = explode(',', $additionals);
+        $lines = [];
+        foreach ($additionals as $add) {
+            $add = trim($add);
+            $lines[] = $this->spaces(12) . "\$table->{$add}();";
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
     protected function getFieldDeclaration($parts)
@@ -74,7 +92,7 @@ class MigrationCommand extends BaseCommand {
     {
         $keys = $this->option('keys');
         if(! $keys){
-            return "            // Constraints declaration";
+            return $this->spaces(12) . "// Constraints declaration";
         }
 
         $items = $keys;
@@ -127,5 +145,5 @@ class MigrationCommand extends BaseCommand {
 
         return $constraint . ';';
     }
-    
+
 }

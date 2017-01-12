@@ -6,6 +6,7 @@ class SeederCommand extends BaseCommand {
 	protected $signature = 'wn:seeder
         {model : full qualified name of the model.}
         {--count=10 : number of elements to add in database.}
+        {--force= : override the existing files}
     ';
 
 	protected $description = 'Generates a seeder';
@@ -25,9 +26,7 @@ class SeederCommand extends BaseCommand {
             ->get();
 
 
-        $this->save($content, $file);
-
-        $this->info("{$name} generated !");
+        $this->save($content, $file, $name);
     }
 
     protected function getSeederName($name)

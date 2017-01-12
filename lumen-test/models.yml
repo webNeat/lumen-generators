@@ -1,0 +1,22 @@
+---
+Post:
+  belongsToMany: tags
+  fields:
+    title:
+      schema: string
+      rules: required
+      tags: fillable
+    content:
+      schema: text nullable
+      tags: fillable
+    published_at:
+      schema: date
+      rules: date
+      tags: date fillable
+Tag:
+  belongsToMany: posts
+  fields:
+    name:
+      schema: string unique
+      rules: required
+      tags: fillable

@@ -69,11 +69,24 @@ $I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --keys="
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');
-$I->seeInThisFile('$table->foreign(\'category_type_id\')
-                ->references(\'id\')
-                ->on(\'category_types\');');
-$I->seeInThisFile("\$table->foreign('user_id')
-                ->references('identifier')
-                ->on('members')
-                ->onDelete('cascade');");
+$I->seeInThisFile(
+"\$table->foreign('category_type_id')\n".
+"                ->references('id')\n".
+"                ->on('category_types');"
+);
+$I->seeInThisFile(
+"\$table->foreign('user_id')\n".
+"                ->references('identifier')\n".
+"                ->on('members')". PHP_EOL .
+"                ->onDelete('cascade');");
+$I->deleteFile('./database/migrations/create_tasks.php');
+
+$I->wantTo('generate a migration with additional columns');
+$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --add=softDeletes,nullableTimestamps');
+$I->seeInShellOutput('tasks migration generated');
+$I->seeFileFound('./database/migrations/create_tasks.php');
+$I->openFile('./database/migrations/create_tasks.php');
+$I->dontSeeInThisFile("\$table->timestamps();");
+$I->seeInThisFile("\$table->softDeletes();");
+$I->seeInThisFile("\$table->nullableTimestamps();");
 $I->deleteFile('./database/migrations/create_tasks.php');

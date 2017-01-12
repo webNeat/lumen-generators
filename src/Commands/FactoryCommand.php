@@ -7,7 +7,9 @@ class FactoryCommand extends BaseCommand {
         {model : full qualified name of the model.}
         {--fields= : the fields to generate.}
         {--file= : the factories file.}
-        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}';
+        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
+        {--force= : override the existing files}
+    ';
 
 	protected $description = 'Generates a model factory';
 
@@ -26,9 +28,7 @@ class FactoryCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, $file);
-
-        $this->info("{$model} factory generated !");
+        $this->save($content, $file, "{$model} factory", true);
     }
 
     protected function getFile()

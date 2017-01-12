@@ -7,7 +7,8 @@ class PivotTableCommand extends BaseCommand {
         {model1 : Name of the first model or table}
         {model2 : Name of the second model or table}
         {--file= : name of the migration file (to use only for testing purpose).}
-        ';
+        {--force= : override the existing files}
+    ';
 
 	protected $description = 'Generates creation migration for a pivot table';
 
@@ -22,7 +23,8 @@ class PivotTableCommand extends BaseCommand {
             '--schema' => $this->schema(),
             '--keys' => $this->keys(),
             '--file' => $this->option('file'),
-            '--parsed' => false
+            '--parsed' => false,
+            '--force' => $this->option('force')
         ]);
     }
 
@@ -31,7 +33,7 @@ class PivotTableCommand extends BaseCommand {
         $this->tables = array_map(function($arg) {
             return snake_case(str_singular($this->argument($arg)));
         }, ['model1', 'model2']);
-        
+
         sort($this->tables);
     }
 
@@ -48,5 +50,5 @@ class PivotTableCommand extends BaseCommand {
             return $table . '_id';
         }, $this->tables));
     }
-    
+
 }
