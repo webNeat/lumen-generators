@@ -12,7 +12,7 @@ class {{name}}Table extends Migration
             $table->increments('id');
 {{schema}}
 {{constraints}}
-            $table->timestamps();
+{{additionals}}
         });
     }
 

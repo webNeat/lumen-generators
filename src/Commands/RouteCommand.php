@@ -22,9 +22,7 @@ class RouteCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, './app/Http/routes.php');
-
-        $this->info("{$resource} routes generated !");
+        $this->save($content, './app/Http/routes.php', "{$resource} routes", true);
     }
 
     protected function getController()
@@ -35,5 +33,5 @@ class RouteCommand extends BaseCommand {
         }
         return $controller;
     }
-    
+
 }

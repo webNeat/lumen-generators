@@ -38,12 +38,12 @@ $I->wantTo('generate model factories with fields');
 $I->runShellCommand('php artisan wn:factory "App\Task" --fields="title:sentence(3),description:paragraph(3),due:date,hidden:boolean"');
 $I->seeInShellOutput('App\Task factory generated');
 $I->openFile('./database/factories/ModelFactory.php');
-$I->seeInThisFile("
-        'title' => \$faker->sentence(3),
-        'description' => \$faker->paragraph(3),
-        'due' => \$faker->date,
-        'hidden' => \$faker->boolean,
-");
+$I->seeInThisFile(
+"        'title' => \$faker->sentence(3)," . PHP_EOL .
+"        'description' => \$faker->paragraph(3)," . PHP_EOL .
+"        'due' => \$faker->date," . PHP_EOL .
+"        'hidden' => \$faker->boolean,"
+);
 $I->writeToFile('./database/factories/ModelFactory.php', "<?php
 
 /*

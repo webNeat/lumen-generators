@@ -19,24 +19,3 @@ $factory->define(App\User::class, function ($faker) {
         'remember_token' => str_random(10),
     ];
 });
-/**
- * Factory definition for model App\Task.
- */
-$factory->define(App\Task::class, function ($faker) {
-    return [
-		// Fields here
-    ];
-});
-
-/**
- * Factory definition for model App\TaskCategory.
- */
-$factory->define(App\TaskCategory::class, function ($faker) {
-    return [
-        'name' => $faker->word,
-        'descr' => $faker->paragraph,
-        'due' => $faker->date,
-        'project_id' => $faker->key,
-        'user_id' => $faker->key,
-    ];
-});

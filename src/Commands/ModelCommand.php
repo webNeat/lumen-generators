@@ -13,7 +13,9 @@ class ModelCommand extends BaseCommand {
         {--belongs-to-many= : belongsToMany relationships.}
         {--rules= : fields validation rules.}
         {--path=app : where to store the model php file.}
-        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}';
+        {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
+        {--force= : override the existing files}
+    ';
 
 	protected $description = 'Generates a model class for a RESTfull resource';
 
@@ -33,9 +35,7 @@ class ModelCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, "./{$path}/{$name}.php");
-
-        $this->info("{$name} model generated !");
+        $this->save($content, "./{$path}/{$name}.php", "{$name} model");
     }
 
     protected function getAsArrayFields($arg, $isOption = true)

@@ -13,28 +13,29 @@ $I->seeInThisFile('namespace App;');
 $I->seeInThisFile('class TaskCategory extends Model');
 $I->seeInThisFile('protected $fillable = ["name", "descr", "due", "project_id", "user_id"];');
 $I->seeInThisFile('protected $dates = ["due"];');
-$I->seeInThisFile('public static $rules = [
-        "name" => "requied",
-        "project_id" => "required|numeric",
-        "user_id" => "required|numeric",
-    ];');
-$I->seeInThisFile('
-    public function tags()
+$I->seeInThisFile(
+"public static \$rules = [\n".
+"        \"name\" => \"requied\"," . PHP_EOL .
+"        \"project_id\" => \"required|numeric\"," . PHP_EOL .
+"        \"user_id\" => \"required|numeric\",\n".
+"    ];");
+$I->seeInThisFile(
+'    public function tags()
     {
         return $this->hasMany("App\Tag");
-    }
-
-    public function tasks()
+    }');
+$I->seeInThisFile(
+'    public function tasks()
     {
         return $this->hasMany("App\Task");
-    }
-
-    public function project()
+    }');
+$I->seeInThisFile(
+'    public function project()
     {
         return $this->belongsTo("App\Project");
-    }
-
-    public function creator()
+    }');
+$I->seeInThisFile(
+'    public function creator()
     {
         return $this->belongsTo("App\User");
     }');
@@ -46,21 +47,20 @@ $I->seeFileFound('./database/migrations/create_task_categories.php');
 $I->openFile('./database/migrations/create_task_categories.php');
 
 $I->seeInThisFile('class CreateTaskCategoriesTable extends Migration');
-$I->seeInThisFile('Schema::create(\'task_categories\', function(Blueprint $table) {
-            $table->increments(\'id\');
-            $table->string(\'name\')->unique();
-            $table->text(\'descr\')->nullable();
-            $table->timestamp(\'due\');
-            $table->integer(\'project_id\')->unsigned();
-            $table->integer(\'user_id\')->unsigned();
-            $table->foreign(\'project_id\')
-                ->references(\'id\')
-                ->on(\'projects\');
-            $table->foreign(\'user_id\')
-                ->references(\'id\')
-                ->on(\'users\');
-            $table->timestamps();
-        });');
+$I->seeInThisFile("Schema::create('task_categories', function(Blueprint \$table) {\n".
+"            \$table->increments('id');\n".
+"            \$table->string('name')->unique();" . PHP_EOL .
+"            \$table->text('descr')->nullable();" . PHP_EOL .
+"            \$table->timestamp('due');" . PHP_EOL .
+"            \$table->integer('project_id')->unsigned();" . PHP_EOL.
+"            \$table->integer('user_id')->unsigned();\n" .
+"            \$table->foreign('project_id')\n".
+"                ->references('id')\n".
+"                ->on('projects');" . PHP_EOL .
+"            \$table->foreign('user_id')\n".
+"                ->references('id')\n".
+"                ->on('users');\n".
+"            \$table->timestamps();");
 
 $I->deleteFile('./database/migrations/create_task_categories.php');
 
@@ -110,9 +110,9 @@ $app->get("/", function () use ($app) {
 ');
 
 // Checking model factory
-$I->openFile('./database/factories/ModelFactory.php');
-// $I->seeInThisFile("
-// /**
+// $I->openFile('./database/factories/ModelFactory.php');
+// $I->seeInThisFile(
+// "/**
 //  * Factory definition for model App\TaskCategory.
 //  */
 // \$factory->define(App\TaskCategory::class, function (\$faker) {
@@ -146,15 +146,15 @@ $I->writeToFile('./database/factories/ModelFactory.php', "<?php
 ");
 
 // Checking database seeder
-$I->openFile('./database/seeds/TaskCategoriesTableSeeder.php');
-$I->seeInThisFile('
-use Illuminate\Database\Seeder;
+// $I->openFile('./database/seeds/TaskCategoriesTableSeeder.php');
+// $I->seeInThisFile('
+// use Illuminate\Database\Seeder;
 
-class TaskCategoriesTableSeeder extends Seeder
-{
-    public function run()
-    {
-        factory(App\TaskCategory::class, 10)->create();
-    }
-}');
-$I->deleteFile('./database/seeds/TaskCategoriesTableSeeder.php');
+// class TaskCategoriesTableSeeder extends Seeder
+// {
+//     public function run()
+//     {
+//         factory(App\TaskCategory::class, 10)->create();
+//     }
+// }');
+// $I->deleteFile('./database/seeds/TaskCategoriesTableSeeder.php');

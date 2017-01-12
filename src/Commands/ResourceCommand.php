@@ -11,8 +11,10 @@ class ResourceCommand extends BaseCommand {
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
         {--migration-file= : the migration file name.}
+        {--path=app : where to store the model file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
-        ';
+        {--force= : override the existing files}
+    ';
 
     protected $description = 'Generates a model, migration, controller and routes for RESTful resource';
 
@@ -36,27 +38,30 @@ class ResourceCommand extends BaseCommand {
             '--belongs-to' => $this->option('belongs-to'),
             '--belongs-to-many' => $this->option('belongs-to-many'),
             '--rules' => $this->rules(),
-            '--path' => 'app',
+            '--path' => $this->option('path'),
+            '--force' => $this->option('force'),
             '--parsed' => true
         ]);
-        
+
         // generating the migration
         $this->call('wn:migration', [
             'table' => $tableName,
             '--schema' => $this->schema(),
             '--keys' => $this->migrationKeys(),
             '--file' => $this->option('migration-file'),
+            '--force' => $this->option('force'),
             '--parsed' => true
         ]);
-        
+
         // generating REST actions trait if doesn't exist
         if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
             $this->call('wn:controller:rest-actions');
         }
-        
+
         // generating the controller and routes
         $this->call('wn:controller', [
             'model' => $modelName,
+            '--force' => $this->option('force'),
             '--no-routes' => false
         ]);
 
@@ -64,13 +69,14 @@ class ResourceCommand extends BaseCommand {
         $this->call('wn:factory', [
             'model' => 'App\\' . $modelName,
             '--fields' => $this->factoryFields(),
+            '--force' => $this->option('force'),
             '--parsed' => true
         ]);
 
         // generating database seeder
-        $this->call('wn:seeder', [
-            'model' => 'App\\' . $modelName
-        ]);
+        // $this->call('wn:seeder', [
+        //     'model' => 'App\\' . $modelName
+        // ]);
 
     }
 
@@ -95,13 +101,13 @@ class ResourceCommand extends BaseCommand {
                     ],
                     'rules' => 'required|numeric',
                     'tags' => ['fillable', 'key'],
-                    'factory' => 'key' 
+                    'factory' => 'key'
                 ];
             }, $this->foreignKeys()));
-        } 
+        }
 
     }
-    
+
     protected function fieldsHavingTag($tag)
     {
         return array_map(function($field){
