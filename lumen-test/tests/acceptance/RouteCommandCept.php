@@ -59,3 +59,36 @@ $app->get("/", function () use ($app) {
     return $app->welcome();
 });
 ');
+
+
+$I->wantTo('run wn:routes in Lumen 5.3+');
+mkdir('./routes');
+$I->writeToFile('./routes/web.php', '<?php
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register all of the routes for an application.
+| It is a breeze. Simply tell Lumen the URIs it should respond to
+| and give it the Closure to call when that URI is requested.
+|
+*/
+
+$app->get("/", function () use ($app) {
+    return $app->version();
+});
+');
+
+$I->runShellCommand('php artisan wn:route foo --controller=customController');
+$I->seeInShellOutput('foo routes generated');
+$I->openFile('./routes/web.php');
+$I->seeInThisFile("
+\$app->get('foo', 'customController@all');
+\$app->get('foo/{id}', 'customController@get');
+\$app->post('foo', 'customController@add');
+\$app->put('foo/{id}', 'customController@put');
+\$app->delete('foo/{id}', 'customController@remove');
+");
+$I->deleteDir('./routes');

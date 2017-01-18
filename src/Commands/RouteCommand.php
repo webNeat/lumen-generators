@@ -13,7 +13,11 @@ class RouteCommand extends BaseCommand {
     {
         $resource = $this->argument('resource');
 
-        $content = $this->fs->get('./app/Http/routes.php');
+        $routesPath = './routes/web.php';
+        if (! $this->fs->exists($routesPath))
+            $routesPath = './app/Http/routes.php';
+
+        $content = $this->fs->get($routesPath);
 
         $content .= PHP_EOL . $this->getTemplate('routes')
             ->with([
@@ -22,7 +26,7 @@ class RouteCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, './app/Http/routes.php', "{$resource} routes", true);
+        $this->save($content, $routesPath, "{$resource} routes", true);
     }
 
     protected function getController()
