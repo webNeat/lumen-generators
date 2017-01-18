@@ -622,6 +622,7 @@ Product:
       schema: 'decimal:5,2' # need quotes when using ','
       rules: numeric
       tags: fillable
+  add: timestamps softDeletes
 ```
 
 ## Testing
