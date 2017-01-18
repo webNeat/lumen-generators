@@ -1,6 +1,7 @@
 # Lumen generators
 
 [![Build Status](https://travis-ci.org/webNeat/lumen-generators.svg?branch=master)](https://travis-ci.org/webNeat/lumen-generators)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/webNeat/lumen-generators/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/webNeat/lumen-generators/?branch=master)
 [![License](https://poser.pugx.org/laravel/framework/license.svg)](http://opensource.org/licenses/MIT)
 
 A collection of generators for [Lumen](http://lumen.laravel.com) and [Laravel 5](http://laravel.com/).

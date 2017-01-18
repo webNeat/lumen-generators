@@ -138,7 +138,7 @@ class ArgumentFormatLoader {
 
 	    $attr = $matches['attr'];
 	    $type = empty($matches['type']) ? null : $matches['type'];
-	    $isArray = (@$matches[2][0] === '[');
+	    $isArray = (isset($matches[2][0]) && $matches[2][0] === '[');
 	    
 	    return [$attr, $type, $isArray];
 	}
