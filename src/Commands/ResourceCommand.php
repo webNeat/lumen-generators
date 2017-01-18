@@ -11,6 +11,7 @@ class ResourceCommand extends BaseCommand {
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
         {--migration-file= : the migration file name.}
+        {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--path=app : where to store the model file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
@@ -40,6 +41,7 @@ class ResourceCommand extends BaseCommand {
             '--rules' => $this->rules(),
             '--path' => $this->option('path'),
             '--force' => $this->option('force'),
+            '--timestamps' => $this->hasTimestamps() ? 'true' : 'false',
             '--parsed' => true
         ]);
 
@@ -50,6 +52,7 @@ class ResourceCommand extends BaseCommand {
             '--keys' => $this->migrationKeys(),
             '--file' => $this->option('migration-file'),
             '--force' => $this->option('force'),
+            '--add' => $this->option('add'),
             '--parsed' => true
         ]);
 
@@ -178,6 +181,14 @@ class ResourceCommand extends BaseCommand {
         }, array_filter($this->fields, function($field){
             return isset($field['factory']) && $field['factory'];
         }));
+    }
+
+    protected function hasTimestamps()
+    {
+        $additionals = explode(',', $this->option('add'));
+        return in_array('nullableTimestamps', $additionals)
+            || in_array('timestamps', $additionals)
+            || in_array('timestampsTz', $additionals);
     }
 
 }

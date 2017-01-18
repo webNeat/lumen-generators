@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a migration without schema');
-$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks');
+$I->runShellCommand('php artisan wn:migration tasks --add=timestamps --file=create_tasks');
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');
@@ -32,8 +32,39 @@ class CreateTasksTable extends Migration
 ');
 $I->deleteFile('./database/migrations/create_tasks.php');
 
+$I->wantTo('generate a migration without schema or timestamps');
+$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks');
+$I->seeInShellOutput('tasks migration generated');
+$I->seeFileFound('./database/migrations/create_tasks.php');
+$I->openFile('./database/migrations/create_tasks.php');
+$I->seeFileContentsEqual('<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateTasksTable extends Migration
+{
+
+    public function up()
+    {
+        Schema::create(\'tasks\', function(Blueprint $table) {
+            $table->increments(\'id\');
+            // Schema declaration
+            // Constraints declaration
+
+        });
+    }
+
+    public function down()
+    {
+        Schema::drop(\'tasks\');
+    }
+}
+');
+$I->deleteFile('./database/migrations/create_tasks.php');
+
 $I->wantTo('generate a migration with schema');
-$I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --schema="amount:decimal.5,2:after.\'size\':default.8 title:string:nullable"');
+$I->runShellCommand('php artisan wn:migration tasks --add=timestamps --file=create_tasks --schema="amount:decimal.5,2:after.\'size\':default.8 title:string:nullable"');
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');

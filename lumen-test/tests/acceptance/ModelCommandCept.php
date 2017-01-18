@@ -27,6 +27,34 @@ class TestingModel extends Model {
 ');
 $I->deleteFile('./tests/tmp/TestingModel.php');
 
+$I->wantTo('generate a model without fillable fields, dates or timestamps');
+$I->runShellCommand('php artisan wn:model TestingModel --path=tests/tmp --force=true --timestamps=false');
+$I->seeInShellOutput('TestingModel model generated');
+$I->seeFileFound('./tests/tmp/TestingModel.php');
+$I->openFile('./tests/tmp/TestingModel.php');
+
+$I->seeFileContentsEqual('<?php namespace Tests\Tmp;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TestingModel extends Model {
+
+    protected $fillable = [];
+
+    protected $dates = [];
+
+    public static $rules = [
+        // Validation rules
+    ];
+
+    public $timestamps = false;
+
+    // Relationships
+
+}
+');
+$I->deleteFile('./tests/tmp/TestingModel.php');
+
 $I->wantTo('generate a model with fillable fields');
 $I->runShellCommand('php artisan wn:model TestingModel --fillable=name,title --path=tests/tmp');
 $I->seeFileFound('./tests/tmp/TestingModel.php');

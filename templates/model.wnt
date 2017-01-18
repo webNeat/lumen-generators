@@ -12,6 +12,6 @@ class {{name}} extends Model {
 {{rules}}
     ];
 
-{{relations}}
+{{additional}}{{relations}}
 
 }

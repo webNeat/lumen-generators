@@ -6,6 +6,7 @@ class PivotTableCommand extends BaseCommand {
 	protected $signature = 'wn:pivot-table
         {model1 : Name of the first model or table}
         {model2 : Name of the second model or table}
+        {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--file= : name of the migration file (to use only for testing purpose).}
         {--force= : override the existing files}
     ';
@@ -24,7 +25,8 @@ class PivotTableCommand extends BaseCommand {
             '--keys' => $this->keys(),
             '--file' => $this->option('file'),
             '--parsed' => false,
-            '--force' => $this->option('force')
+            '--force' => $this->option('force'),
+            '--add' => $this->option('add')
         ]);
     }
 

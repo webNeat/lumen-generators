@@ -6,7 +6,7 @@ class MigrationCommand extends BaseCommand {
 	protected $signature = 'wn:migration
         {table : The table name.}
         {--schema= : the schema.}
-        {--add= : specifies additional columns like softDeletes, rememberToken and nullableTimestamps.}
+        {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--keys= : foreign keys.}
         {--file= : name of the migration file (to use only for testing purpose).}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
@@ -64,7 +64,7 @@ class MigrationCommand extends BaseCommand {
     {
         $additionals = $this->option('add');
         if (empty($additionals)) {
-            $additionals = 'timestamps';
+            return '';
         }
 
         $additionals = explode(',', $additionals);

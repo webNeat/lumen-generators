@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a RESTful resource');
-$I->runShellCommand('php artisan wn:resource task_category "name;string:unique;requied;fillable;word descr;text:nullable;;fillable;paragraph due;timestamp;;fillable,date;date" --has-many="tags,tasks" --belongs-to="project,creator:User" --migration-file=create_task_categories');
+$I->runShellCommand('php artisan wn:resource task_category "name;string:unique;requied;fillable;word descr;text:nullable;;fillable;paragraph due;timestamp;;fillable,date;date" --has-many="tags,tasks" --belongs-to="project,creator:User" --add=timestamps --migration-file=create_task_categories');
 
 // Checking the model
 $I->seeInShellOutput('TaskCategory model generated');

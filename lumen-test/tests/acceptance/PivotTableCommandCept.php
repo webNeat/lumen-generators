@@ -2,7 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('generate a pivot table');
-$I->runShellCommand('php artisan wn:pivot-table Tag Project --file=pivot_table');
+$I->runShellCommand('php artisan wn:pivot-table Tag Project --add=timestamps --file=pivot_table');
 $I->seeInShellOutput('project_tag migration generated');
 $I->seeFileFound('./database/migrations/pivot_table.php');
 $I->openFile('./database/migrations/pivot_table.php');

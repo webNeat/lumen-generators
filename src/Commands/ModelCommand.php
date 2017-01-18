@@ -12,6 +12,7 @@ class ModelCommand extends BaseCommand {
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
         {--rules= : fields validation rules.}
+        {--timestamps=true : enables timestamps on the model.}
         {--path=app : where to store the model php file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
@@ -31,7 +32,8 @@ class ModelCommand extends BaseCommand {
                 'fillable' => $this->getAsArrayFields('fillable'),
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
-                'rules' => $this->getRules()
+                'rules' => $this->getRules(),
+                'additional' => $this->getAdditional()
             ])
             ->get();
 
@@ -112,6 +114,13 @@ class ModelCommand extends BaseCommand {
         }
 
         return implode(PHP_EOL, $rules);
+    }
+
+    protected function getAdditional()
+    {
+        return $this->option('timestamps') == 'false'
+            ? "    public \$timestamps = false;" . PHP_EOL . PHP_EOL
+            : '';
     }
 
 }

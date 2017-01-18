@@ -79,7 +79,7 @@ wn:route                    Generates RESTful routes.
 To generate a RESTful resource for your application (model, migration, controller and RESTful routes), you simply need to run one single command. For example: 
 
 ```
-php artisan wn:resource task "name;string;required;fillable project_id;integer:unsigned;numeric;fillable,key due;date;;date" --belongs-to=project
+php artisan wn:resource task "name;string;required;fillable project_id;integer:unsigned;numeric;fillable,key due;date;;date" --add=timestamps --belongs-to=project
 ```
 
 will generate these files:
@@ -257,7 +257,7 @@ More then that, you can generate multiple resources with only one command ! [Cli
 The `wn:model` command is used to generate a model class based on Eloquent. It has the following syntax:
 
 ```
-wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--belongs-to-many=...] [--rules=...] [--path=...] [--force=true]
+wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--belongs-to-many=...] [--rules=...] [--timestamps=false] [--path=...] [--force=true]
 ```
 
 - **name**: the name of the model. 
@@ -357,6 +357,8 @@ gives:
 	];
 ```
 
+- **--timestamps**: Enables timestamps on the model. Giving `--timestamps=false` will add `public $timestamps = false;` to the generated model. The default value is `true`.
+
 - **--force**: tells the generator to override the existing file. By default, if the model file already exists, it will not be overriden and the output will be something like:
 
 ```
@@ -368,7 +370,7 @@ TestingModel model already exists; use --force option to override it !
 The `wn:migration` command is used to generate a migration to create a table with schema. It has the following syntax:
 
 ```
-wn:migration table [--schema=...] [--keys=...] [--force=true] [--file=...]
+wn:migration table [--schema=...] [--add=...] [--keys=...] [--force=true] [--file=...]
 ```
 
 - **table**: the name of the table to create.
@@ -398,7 +400,7 @@ class CreateTasksMigration extends Migration
             $table->decimal('amount', 5, 2)->after('size')->default(8);
             $table->string('title')->nullable();
             // Constraints declaration
-            $table->timestamps();
+
         });
     }
 
@@ -408,6 +410,8 @@ class CreateTasksMigration extends Migration
     }
 }
 ```
+
+- **--add**: Specifies additional columns like `timestamps`, `softDeletes`, `rememberToken` and `nullableTimestamps`.
 
 - **--keys**: the foreign keys of the table following the syntax `field:column:table:on_delete:on_update ...`. The `column` is optional ("id" by default). The `table` is optional if the field follows the naming convention `singular_table_name_id`. `on_delete` and `on_update` are optional too.
 
@@ -433,15 +437,17 @@ $table->foreign('user_id')
 The `wn:pivot-table` command is used to generate a migration to create a pivot table between two models. It has the following syntax:
 
 ```
-wn:pivot-table model1 model2 [--force=true] [--file=...]
+wn:pivot-table model1 model2 [--add=...] [--force=true] [--file=...]
 ```
 
 - **model1** and **model2**: names of the two models (or the two tables if the models don't follow the naming conventions)
 
+- **--add**: Specifies additional columns like `timestamps`, `softDeletes`, `rememberToken` and `nullableTimestamps`.
+
 - **--file**: The migration file name. By default the name follows the patern `date_time_create_table_name.php`.
 
 ```
-php artisan wn:pivot-table Tag Project
+php artisan wn:pivot-table Tag Project --add=timestamps
 ```
 gives:
 
@@ -541,7 +547,7 @@ $app->delete('project-type/{id}', 'ProjectTypesController@remove');
 
 ### Resource Generator
 
-The `wn:resource` command makes it very easy to generate a RESTful resource. It generates a model, migration, controller and routes. The syntax is : `wn:resource name fields [--has-many=...] [--has-one=...] [--belongs-to=...] [--migration-file=...] [--path=...] [--force=true]`
+The `wn:resource` command makes it very easy to generate a RESTful resource. It generates a model, migration, controller and routes. The syntax is : `wn:resource name fields [--add=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--migration-file=...] [--path=...] [--force=true]`
 
 - **name**: the name of the resource used in the URLs and to determine the model, table and controller names. 
 
@@ -560,6 +566,8 @@ The `wn:resource` command makes it very easy to generate a RESTful resource. It 
 		- `date`: add this field to the dates array of the model.
 
 		- `key`: this field is a foreign key.
+
+- **--add**: Specifies additional columns like `timestamps`, `softDeletes`, `rememberToken` and `nullableTimestamps` of the migration and if the list contains no timestamps, the model with contain `public $timestamps = false;`.
 
 - **--has-one**, **--has-many** and **--belongs-to** are the same as for the `wn:model` command.
 
@@ -623,12 +631,16 @@ To test the generators, I included a fresh lumen installation under the folder `
 ## Development Notes
 
 - **Comming versions**
-    
+
     - **Seeder and Test generators**
 
-    - Requested Feature: [Disabling timestamps](https://github.com/webNeat/lumen-generators/issues/15)
-    
     - Requested Feature: [Custom Templates](https://github.com/webNeat/lumen-generators/issues/13)
+
+- **Version 1.3.0**
+
+    - Requested Feature: [Disabling timestamps](https://github.com/webNeat/lumen-generators/issues/15)
+
+    - Requested Feature: [Lumen 5.3 routes support](https://github.com/webNeat/lumen-generators/issues/21)
 
 - **Version 1.2.0**
 
