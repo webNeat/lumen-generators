@@ -26,6 +26,7 @@ class ResourcesCommand extends BaseCommand {
             $this->call('wn:resource', [
                 'name' => $i['name'],
                 'fields' => $i['fields'],
+                '--add' => $i['add'],
                 '--has-many' => $i['hasMany'],
                 '--has-one' => $i['hasOne'],
                 '--belongs-to' => $i['belongsTo'],
@@ -35,7 +36,7 @@ class ResourcesCommand extends BaseCommand {
             ]);
         }
 
-        // $this->call('migrate');
+        $this->call('migrate');
 
         $this->pivotTables = array_map(
             'unserialize',
@@ -56,14 +57,14 @@ class ResourcesCommand extends BaseCommand {
             // ]);
         }
 
-        // $this->call('migrate');
+        $this->call('migrate');
     }
 
     protected function getResourceParams($modelName, $i)
     {
         $i['name'] = snake_case($modelName);
 
-        foreach(['hasMany', 'hasOne', 'belongsTo', 'belongsToMany'] as $relation){
+        foreach(['hasMany', 'hasOne', 'add', 'belongsTo', 'belongsToMany'] as $relation){
             if(isset($i[$relation])){
                 $i[$relation] = $this->convertArray($i[$relation], ' ', ',');
             } else {

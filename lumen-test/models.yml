@@ -1,6 +1,7 @@
 ---
 Post:
   belongsToMany: tags
+  add: timestamps softDeletes
   fields:
     title:
       schema: string
