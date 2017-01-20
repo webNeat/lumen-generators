@@ -639,6 +639,10 @@ To test the generators, I included a fresh lumen installation under the folder `
 
     - Requested Feature: [Custom Templates](https://github.com/webNeat/lumen-generators/issues/13)
 
+- **Version 1.3.1**
+
+    - Bug Fixed:  [duplicate column for the foriegn key when using `wn:resources`](https://github.com/webNeat/lumen-generators/issues/22)
+
 - **Version 1.3.0**
 
     - Requested Feature: [Disabling timestamps](https://github.com/webNeat/lumen-generators/issues/15)
