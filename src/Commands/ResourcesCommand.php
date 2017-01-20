@@ -36,7 +36,7 @@ class ResourcesCommand extends BaseCommand {
             ]);
         }
 
-        $this->call('migrate');
+        // $this->call('migrate'); // actually needed for pivot seeders !
 
         $this->pivotTables = array_map(
             'unserialize',
@@ -69,25 +69,6 @@ class ResourcesCommand extends BaseCommand {
                 $i[$relation] = $this->convertArray($i[$relation], ' ', ',');
             } else {
                 $i[$relation] = false;
-            }
-        }
-
-        if($i['belongsTo']){
-            $relations = $this->getArgumentParser('relations')->parse($i['belongsTo']);
-            foreach ($relations as $relation){
-                $foreignName = '';
-
-                if(! $relation['model']){
-                    $foreignName = snake_case($relation['name']) . '_id';
-                } else {
-                    $names = array_reverse(explode("\\", $relation['model']));
-                    $foreignName = snake_case($names[0]) . '_id';
-                }
-
-                $i['fields'][$foreignName] = [
-                    'schema' => 'integer',
-                    'tags' => 'key'
-                ];
             }
         }
 
