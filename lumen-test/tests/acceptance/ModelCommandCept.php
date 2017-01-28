@@ -106,3 +106,29 @@ $I->seeInThisFile(
 );
 
 $I->deleteFile('./tests/tmp/TestingModel.php');
+
+$I->wantTo('generate a model with softDeletes');
+$I->runShellCommand('php artisan wn:model TestingModel --soft-deletes=true --path=tests/tmp --force=true');
+$I->seeFileFound('./tests/tmp/TestingModel.php');
+$I->openFile('./tests/tmp/TestingModel.php');
+$I->seeFileContentsEqual('<?php namespace Tests\Tmp;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TestingModel extends Model {
+
+    use Illuminate\Database\Eloquent\SoftDeletes;
+
+    protected $fillable = [];
+
+    protected $dates = [];
+
+    public static $rules = [
+        // Validation rules
+    ];
+
+    // Relationships
+
+}
+');
+$I->deleteFile('./tests/tmp/TestingModel.php');

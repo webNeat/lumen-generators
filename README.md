@@ -259,10 +259,10 @@ More then that, you can generate multiple resources with only one command ! [Cli
 The `wn:model` command is used to generate a model class based on Eloquent. It has the following syntax:
 
 ```
-wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--belongs-to-many=...] [--rules=...] [--timestamps=false] [--path=...] [--force=true]
+wn:model name [--fillable=...] [--dates=...] [--has-many=...] [--has-one=...] [--belongs-to=...] [--belongs-to-many=...] [--rules=...] [--timestamps=false] [--path=...] [--soft-deletes=true] [--force=true]
 ```
 
-- **name**: the name of the model. 
+- **name**: the name of the model.
 
 `php artisan wn:model Task` generates the following:
 
@@ -360,6 +360,8 @@ gives:
 ```
 
 - **--timestamps**: Enables timestamps on the model. Giving `--timestamps=false` will add `public $timestamps = false;` to the generated model. The default value is `true`.
+
+- **--soft-deletes**: Adds `Illuminate\Database\Eloquent\SoftDeletes` trait to the model. This is disabled by default.
 
 - **--force**: tells the generator to override the existing file. By default, if the model file already exists, it will not be overriden and the output will be something like:
 
@@ -638,6 +640,16 @@ To test the generators, I included a fresh lumen installation under the folder `
     - **Seeder and Test generators**
 
     - Requested Feature: [Custom Templates](https://github.com/webNeat/lumen-generators/issues/13)
+    
+    - Requested Feature: [Fractal integration](https://github.com/webNeat/lumen-generators/issues/24)
+    
+    - Requested Feature: [Add possibility to not run migrations when using `wn:resources`](https://github.com/webNeat/lumen-generators/issues/23)
+    
+    - Documentation: [Adding examples](https://github.com/webNeat/lumen-generators/issues/20)
+
+- **Version 1.3.2**
+
+    - Bug Fixed:  [softDeletes not added to model](https://github.com/webNeat/lumen-generators/issues/25)
 
 - **Version 1.3.1**
 

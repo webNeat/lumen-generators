@@ -42,6 +42,7 @@ class ResourceCommand extends BaseCommand {
             '--path' => $this->option('path'),
             '--force' => $this->option('force'),
             '--timestamps' => $this->hasTimestamps() ? 'true' : 'false',
+            '--soft-deletes' => $this->hasSoftDeletes() ? 'true' : 'false',
             '--parsed' => true
         ]);
 
@@ -189,6 +190,12 @@ class ResourceCommand extends BaseCommand {
         return in_array('nullableTimestamps', $additionals)
             || in_array('timestamps', $additionals)
             || in_array('timestampsTz', $additionals);
+    }
+
+    protected function hasSoftDeletes()
+    {
+        $additionals = explode(',', $this->option('add'));
+        return in_array('softDeletes', $additionals);
     }
 
 }

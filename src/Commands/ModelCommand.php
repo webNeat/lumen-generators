@@ -14,6 +14,7 @@ class ModelCommand extends BaseCommand {
         {--rules= : fields validation rules.}
         {--timestamps=true : enables timestamps on the model.}
         {--path=app : where to store the model php file.}
+        {--soft-deletes= : adds SoftDeletes trait to the model.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
     ';
@@ -33,7 +34,8 @@ class ModelCommand extends BaseCommand {
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
                 'rules' => $this->getRules(),
-                'additional' => $this->getAdditional()
+                'additional' => $this->getAdditional(),
+                'uses' => $this->getUses()
             ])
             ->get();
 
@@ -120,6 +122,13 @@ class ModelCommand extends BaseCommand {
     {
         return $this->option('timestamps') == 'false'
             ? "    public \$timestamps = false;" . PHP_EOL . PHP_EOL
+            : '';
+    }
+
+    protected function getUses()
+    {
+        return $this->option('soft-deletes') == 'true'
+            ? '    use Illuminate\Database\Eloquent\SoftDeletes;' . PHP_EOL . PHP_EOL
             : '';
     }
 
