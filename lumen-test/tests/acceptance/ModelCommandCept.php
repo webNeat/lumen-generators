@@ -117,7 +117,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestingModel extends Model {
 
-    use Illuminate\Database\Eloquent\SoftDeletes;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [];
 

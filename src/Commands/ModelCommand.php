@@ -128,7 +128,7 @@ class ModelCommand extends BaseCommand {
     protected function getUses()
     {
         return $this->option('soft-deletes') == 'true'
-            ? '    use Illuminate\Database\Eloquent\SoftDeletes;' . PHP_EOL . PHP_EOL
+            ? '    use \Illuminate\Database\Eloquent\SoftDeletes;' . PHP_EOL . PHP_EOL
             : '';
     }
 
