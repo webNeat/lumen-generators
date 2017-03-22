@@ -4,16 +4,17 @@
 class SeederCommand extends BaseCommand {
 
 	protected $signature = 'wn:seeder
-        {model : full qualified name of the model.}
-        {--count=10 : number of elements to add in database.}
+        {model : full qualified name of the model}
+        {--count=10 : number of elements to add in database}
         {--force= : override the existing files}
+        {--ns=App\Models : model namespace }
     ';
 
 	protected $description = 'Generates a seeder';
 
     public function handle()
     {
-        $model = $this->argument('model');
+        $model = $this->option('ns').'\\'.$this->argument('model');
         $name = $this->getSeederName($model);
         $file = "./database/seeds/{$name}.php";
 
