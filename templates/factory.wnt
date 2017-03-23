@@ -2,7 +2,7 @@
 /**
  * Factory definition for model {{model}}.
  */
-$factory->define({{model}}::class, function ($faker) {
+$factory->define({{model}}::class, function (Faker\Generator $faker) {
     return [
 {{factory_fields}}
     ];
