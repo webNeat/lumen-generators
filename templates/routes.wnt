@@ -1,8 +1,8 @@
 /**
  * Routes for resource {{resource}}
  */
-$app->get('{{resource}}', '{{controller}}@all');
-$app->get('{{resource}}/{id}', '{{controller}}@get');
-$app->post('{{resource}}', '{{controller}}@add');
-$app->put('{{resource}}/{id}', '{{controller}}@put');
-$app->delete('{{resource}}/{id}', '{{controller}}@remove');
+Route::get('{{resource}}', '{{controller}}@all');
+Route::get('{{resource}}/{id}', '{{controller}}@get');
+Route::post('{{resource}}', '{{controller}}@add');
+Route::put('{{resource}}/{id}', '{{controller}}@put');
+Route::delete('{{resource}}/{id}', '{{controller}}@remove');
