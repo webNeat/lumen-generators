@@ -15,7 +15,31 @@ class MigrationCommand extends BaseCommand {
         // {action : One of create, add, remove or drop options.}
         // The action is only create for the moment
 
-	protected $description = 'Generates a migration to create a table with schema';
+    protected $description = 'Generates a migration file.
+
+    <comment>Examples:</comment>
+        - wn:migration categories --schema="name:string.255 active:tinyint.1:default.0 slug:string" --add="timestamps,softDeletes"
+        - wn:migration galleries --schema="name:string user_id:unsignedInteger" --add="timestamps,softDeletes" --keys="user_id"
+    
+    <comment>Available fields:</comment>
+    string(string $column, int $length = 255) 
+    text(string $column) | mediumText longText 
+    boolean(string $column) 
+    integer(string $column, bool $autoIncrement = false, bool $unsigned = false) | tinyInteger smallInteger mediumInteger bigInteger  
+    unsignedInteger(string $column, bool $autoIncrement = false) | unsignedTinyInteger unsignedSmallInteger unsignedMediumInteger unsignedBigInteger 
+    float(string $column, int $total = 8, int $places = 2) 
+    decimal(string $column, int $total = 8, int $places = 2) 
+    double(string $column, int|null $total = null, int|null $places = null) 
+    enum(string $column, array $allowed) 
+    json(string $column) 
+    jsonb(string $column) 
+    date(string $column) 
+    dateTime(string $column)   
+    binary(string $column) 
+    uuid(string $column) 
+    ipAddress(string $column) 
+    macAddress(string $column)
+    ';
 
     public function handle()
     {
