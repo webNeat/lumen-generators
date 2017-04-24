@@ -1,0 +1,10 @@
+/**
+ * Routes for resource {{namespace}}/{{resource}}
+ */
+Route::namespace('{{namespace}}')->prefix('{{resource}}')->group(function () {
+    Route::get('/', '{{controller}}@all');
+    Route::get('/{id}', '{{controller}}@get');
+    Route::post('/', '{{controller}}@add');
+    Route::put('/{id}', '{{controller}}@put');
+    Route::delete('/{id}', '{{controller}}@remove');
+});

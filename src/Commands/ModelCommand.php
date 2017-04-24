@@ -11,6 +11,11 @@ class ModelCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--has-many-through= : hasManyThrough relationships.}
+        {--morph-to= : morphTo relationships.}
+        {--morph-many= : morphMany relationships.}
+        {--morph-to-many= : morphToMany relationships.}
+        {--morphed-by-many= : morphedByMany relationships.}
         {--rules= : fields validation rules.}
         {--timestamps=true : enables timestamps on the model.}
         {--path=app : where to store the model php file.}
@@ -66,7 +71,12 @@ class ModelCommand extends BaseCommand {
             $this->getRelationsByType('hasOne', 'has-one'),
             $this->getRelationsByType('hasMany', 'has-many'),
             $this->getRelationsByType('belongsTo', 'belongs-to'),
-            $this->getRelationsByType('belongsToMany', 'belongs-to-many', true)
+            $this->getRelationsByType('belongsToMany', 'belongs-to-many', true),
+            $this->getRelationsByType('hasManyThrough', 'has-many-through', false, 'relations-hasManyThrough'),
+            $this->getRelationsByType('morphTo', 'morph-to', false, 'relations-morphTo'),
+            $this->getRelationsByType('morphMany', 'morph-many', false, 'relations-morphMany'),
+            $this->getRelationsByType('morphToMany', 'morph-to-many', false, 'relations-morphMany'),
+            $this->getRelationsByType('morphedByMany', 'morphed-by-many', false, 'relations-morphMany')
         );
 
         if(empty($relations)){
@@ -76,23 +86,60 @@ class ModelCommand extends BaseCommand {
         return implode(PHP_EOL, $relations);
     }
 
-    protected function getRelationsByType($type, $option, $withTimestamps = false)
+    protected function getRelationsByType($type, $option, $withTimestamps = false, $parser = 'relations')
     {
         $relations = [];
         $option = $this->option($option);
         if($option){
 
-            $items = $this->getArgumentParser('relations')->parse($option);
+            $items = $this->getArgumentParser($parser)->parse($option);
 
-            $template = ($withTimestamps) ? 'model/relation-with-timestamps' : 'model/relation';
+            $template = ($withTimestamps) ? 'model/relation-with-timestamps' : ($parser=='relations'?'model/relation':'model/relation-'.$type);
             $template = $this->getTemplate($template);
             foreach ($items as $item) {
                 $item['type'] = $type;
-                if(! $item['model']){
-                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
-                } else if(strpos($item['model'], '\\') === false ){
-                    $item['model'] = $this->getNamespace() . '\\' . $item['model'];
-                }
+				if ($parser == 'relations') {
+					if(! $item['model']){
+	                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
+	                } else if(strpos($item['model'], '\\') === false ){
+	                    $item['model'] = $this->getNamespace() . '\\' . $item['model'];
+	                }
+				} else if ($parser != 'relations') {
+					switch($type) {
+						case "hasManyThrough":
+							if(! $item['through'] && $item['model']){
+								$item['through'] = $item['model'];
+								$item['model'] = $item['name'];
+
+								if(strpos($item['through'], '\\') === false ){
+									$item['through'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['through']));
+								}
+								if(strpos($item['model'], '\\') === false ){
+									$item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['model']));
+								}
+							} else {
+								if(strpos($item['through'], '\\') === false ){
+									$item['through'] = $this->getNamespace() . '\\' . $item['through'];
+								}
+								if(strpos($item['model'], '\\') === false ){
+									$item['model'] = $this->getNamespace() . '\\' . $item['model'];
+								}
+							}
+							break;
+						case "morphMany":
+						case "morphToMany":
+						case "morphedByMany":
+							if(! $item['through']){
+								$item['through'] = $item['model'];
+								$item['model'] = ucwords(str_singular($item['name']));
+							}
+							if(strpos($item['model'], '\\') === false ){
+								$item['model'] = $this->getNamespace() . '\\' . $item['model'];
+							}
+							break;
+
+					}
+				}
                 $relations[] = $template->with($item)->get();
             }
         }

@@ -1,0 +1,15 @@
+{
+	"type": "array",
+	"fields": {
+		"type": "object",
+        "separator": "|",
+        "fields": [
+			"name",
+			{
+				"name": "nullable",
+                "type": "boolean",
+				"default": false
+			}
+        ]
+    }
+}

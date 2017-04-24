@@ -39,7 +39,7 @@ class BaseCommand extends Command {
         }
         $this->makeDirectory($path);
         $this->fs->put($path, $content);
-        $this->info("{$name} generated !");
+        $this->info("{$name} generated in {$path}!");
     }
 
     protected function makeDirectory($path)
