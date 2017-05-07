@@ -17,12 +17,7 @@ class ResourcesCommand extends BaseCommand {
 
     public function handle()
     {
-        $path = '';
-        if (! is_null($this->option('path'))) {
-            $path = $this->option('path');
-        }
-
-        $content = $this->fs->get($path . $this->argument('file'));
+        $content = $this->fs->get($this->argument('file'));
         $content = Yaml::parse($content);
 
         foreach ($content as $model => $i){
