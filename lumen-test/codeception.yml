@@ -5,6 +5,7 @@ paths:
     data: tests/_data
     support: tests/_support
     envs: tests/_envs
+    helpers: nil
 settings:
     bootstrap: _bootstrap.php
     colors: false
