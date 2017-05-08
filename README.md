@@ -646,6 +646,10 @@ To test the generators, I included a fresh lumen installation under the folder `
     - Requested Feature: [Add possibility to not run migrations when using `wn:resources`](https://github.com/webNeat/lumen-generators/issues/23)
     
     - Documentation: [Adding examples](https://github.com/webNeat/lumen-generators/issues/20)
+    
+- **Version 1.3.3**
+
+    - Bug Fixed:  [Rules issue when creating resources from YAML file](https://github.com/webNeat/lumen-generators/issues/30)
 
 - **Version 1.3.2**
 
