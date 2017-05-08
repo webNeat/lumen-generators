@@ -105,6 +105,9 @@ class ResourcesCommand extends BaseCommand {
         $name = $field['name'];
         $schema = $this->convertArray(str_replace(':', '.', $field['schema']), ' ', ':');
         $rules = (isset($field['rules'])) ? trim($field['rules']) : '';
+        // Replace space by comma
+        $rules = str_replace(' ', ',', $rules);
+
         $tags = $this->convertArray($field['tags'], ' ', ',');
 
         $string = "{$name};{$schema};{$rules};{$tags}";
