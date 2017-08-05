@@ -20,8 +20,12 @@ class ResourcesCommand extends BaseCommand {
         $content = $this->fs->get($this->argument('file'));
         $content = Yaml::parse($content);
 
+        $modelIndex = 0;
         foreach ($content as $model => $i){
             $i = $this->getResourceParams($model, $i);
+            $migrationName = 'Create' .  ucwords(str_plural($i['name']));
+            $migrationFile = date('Y_m_d_His') . $modelIndex . '_' . snake_case($migrationName) . '_table';
+
 
             $this->call('wn:resource', [
                 'name' => $i['name'],
@@ -32,8 +36,10 @@ class ResourcesCommand extends BaseCommand {
                 '--belongs-to' => $i['belongsTo'],
                 '--belongs-to-many' => $i['belongsToMany'],
                 '--path' => $this->option('path'),
-                '--force' => $this->option('force')
+                '--force' => $this->option('force'),
+                '--migration-file' => $migrationFile
             ]);
+            $modelIndex++;
         }
 
         // $this->call('migrate'); // actually needed for pivot seeders !
