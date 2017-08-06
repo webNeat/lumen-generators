@@ -7,3 +7,5 @@ tests/_output/*
 lumen-test/app
 lumen-test/database
 lumen-test/tests/tmp
+
+.idea

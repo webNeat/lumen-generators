@@ -9,6 +9,8 @@ class ResourcesCommand extends BaseCommand {
         {file : Path to the file containing resources declarations}
         {--path=app : where to store the model files.}
         {--force= : override the existing files}
+        {--laravel= : Boolean (default false) Use Laravel style route definitions}
+
     ';
 
     protected $description = 'Generates multiple resources from a file';
@@ -32,7 +34,8 @@ class ResourcesCommand extends BaseCommand {
                 '--belongs-to' => $i['belongsTo'],
                 '--belongs-to-many' => $i['belongsToMany'],
                 '--path' => $this->option('path'),
-                '--force' => $this->option('force')
+                '--force' => $this->option('force'),
+                '--laravel' => $this->option('laravel')
             ]);
         }
 

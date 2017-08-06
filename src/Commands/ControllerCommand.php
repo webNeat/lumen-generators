@@ -7,6 +7,8 @@ class ControllerCommand extends BaseCommand {
         {model : Name of the model (with namespace if not App)}
 		{--no-routes= : without routes}
         {--force= : override the existing files}
+        {--laravel= : Boolean (default false) Use Laravel style route definitions}
+
     ';
 
 	protected $description = 'Generates RESTful controller using the RESTActions trait';
@@ -35,7 +37,8 @@ class ControllerCommand extends BaseCommand {
         if(! $this->option('no-routes')){
             $this->call('wn:route', [
                 'resource' => snake_case($name, '-'),
-                '--controller' => $controller
+                '--controller' => $controller,
+                '--laravel' => $this->options('laravel')
             ]);
         }
     }

@@ -15,6 +15,7 @@ class ResourceCommand extends BaseCommand {
         {--path=app : where to store the model file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
+        {--laravel= : Boolean (default false) Use Laravel style route definitions}
     ';
 
     protected $description = 'Generates a model, migration, controller and routes for RESTful resource';
@@ -66,7 +67,8 @@ class ResourceCommand extends BaseCommand {
         $this->call('wn:controller', [
             'model' => $modelName,
             '--force' => $this->option('force'),
-            '--no-routes' => false
+            '--no-routes' => false,
+            '--laravel' => $this->option('laravel')
         ]);
 
         // generating model factory

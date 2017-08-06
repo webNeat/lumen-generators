@@ -11,6 +11,14 @@ echo "<?php
     return \$app->welcome();
 });" > app/Http/routes.php
 
+echo "<?php
+/*
+|------------------------------------------
+|   ***** DUMMY ROUTES FOR TESTING ONLY *****
+|------------------------------------------
+*/
+" > routes/api.php
+
 # Controllers
 rm app/Http/Controllers/*.php 2> /dev/null
 echo "<?php
