@@ -8,7 +8,7 @@ class RouteCommand extends BaseCommand {
 	protected $signature = 'wn:route
 		{resource : Name of the resource.}
         {--controller= : Name of the RESTful controller.}
-        {--laravel :R Use Laravel style route definitions}
+        {--laravel= : Use Laravel style route definitions}
     ';
 
 	protected $description = 'Generates RESTful routes.';
