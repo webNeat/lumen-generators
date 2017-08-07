@@ -10,7 +10,7 @@ class ResourcesCommand extends BaseCommand {
         {file : Path to the file containing resources declarations}
         {--path=app : where to store the model files.}
         {--force= : override the existing files}
-        {--laravel= : Boolean (default false) Use Laravel style route definitions}
+        {--laravel= : Use Laravel style route definitions}
 
     ';
 
@@ -36,8 +36,10 @@ class ResourcesCommand extends BaseCommand {
                 '--belongs-to-many' => $i['belongsToMany'],
                 '--path' => $this->option('path'),
                 '--force' => $this->option('force'),
-                '--laravel' => $this->input->hasOption('laravel') ? $this->option('laravel') : false
             ];
+            if ($this->option('laravel')) {
+                $options['--laravel'] = true;
+            }
 
             $this->call('wn:resource', $options);
         }

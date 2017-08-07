@@ -8,7 +8,7 @@ class RouteCommand extends BaseCommand {
 	protected $signature = 'wn:route
 		{resource : Name of the resource.}
         {--controller= : Name of the RESTful controller.}
-        {--laravel= : Boolean (default false) Use Laravel style route definitions}
+        {--laravel :R Use Laravel style route definitions}
     ';
 
 	protected $description = 'Generates RESTful routes.';
@@ -16,7 +16,7 @@ class RouteCommand extends BaseCommand {
     public function handle()
     {
         $resource = $this->argument('resource');
-        $laravelRoutes = $this->input->hasOption('laravel') ? $this->option('laravel') : false;
+        $laravelRoutes = $this->option('laravel');
         $templateFile = 'routes';
         $routesPath = 'routes/web.php';
         if ($laravelRoutes) {
@@ -61,7 +61,6 @@ class RouteCommand extends BaseCommand {
                     'controller' => $this->getController()
                 ])
                 ->get();
-
         $this->save($content, $routesPath, "{$resource} routes", true);
     }
 
