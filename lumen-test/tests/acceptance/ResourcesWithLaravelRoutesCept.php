@@ -2,6 +2,7 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantTo('Generate RESTful resources from a file with Laravel Routes');
+$I->writeToFile('database/database.sqlite', '');
 $I->runShellCommand('php artisan wn:resources tests/_data/ResourcesTest.yml --laravel=true');
 
 // Checking the model
@@ -105,6 +106,8 @@ $I->writeToFile('./database/factories/ModelFactory.php', "<?php
     ];
 });
 ");
+
+$I->deleteFile('database/database.sqlite');
 
 // Checking database seeder
 // $I->openFile('./database/seeds/TaskCategoriesTableSeeder.php');
