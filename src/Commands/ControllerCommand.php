@@ -38,14 +38,8 @@ class ControllerCommand extends BaseCommand {
             $options = [
                 'resource' => snake_case($name, '-'),
                 '--controller' => $controller,
+                '--laravel' => $this->input->hasOption('laravel') ? $this->option('laravel') : false
             ];
-//            try {
-//                if($this->option('laravel')) {
-//                    $options['--laravel'] = true;
-//                };
-//            } catch (InvalidArgumentException $e) {
-//                // Do nothing
-//            }
 
             $this->call('wn:route', $options);
         }

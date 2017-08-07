@@ -36,15 +36,8 @@ class ResourcesCommand extends BaseCommand {
                 '--belongs-to-many' => $i['belongsToMany'],
                 '--path' => $this->option('path'),
                 '--force' => $this->option('force'),
+                '--laravel' => $this->input->hasOption('laravel') ? $this->option('laravel') : false
             ];
-
-            try {
-                if($this->option('laravel')) {
-                    $options['--laravel'] = true;
-                };
-            } catch (InvalidArgumentException $e) {
-                // Do nothing
-            }
 
             $this->call('wn:resource', $options);
         }

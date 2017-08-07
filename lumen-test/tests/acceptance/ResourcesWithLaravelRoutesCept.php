@@ -39,7 +39,7 @@ $I->deleteFile('./app/Http/Controllers/AuthorsController.php');
 $I->deleteFile('./app/Http/Controllers/LibrariesController.php');
 $I->deleteFile('./app/Http/Controllers/BooksController.php');
 
-$I->seeFileFound('routes/api.php');
+$I->seeFileFound('./routes/api.php');
 
 $I->seeInThisFile('
 Route::get(\'author\', \'AuthorsController@all\');

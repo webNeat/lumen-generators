@@ -64,20 +64,13 @@ class ResourceCommand extends BaseCommand {
         if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
             $this->call('wn:controller:rest-actions');
         }
-
         // generating the controller and routes
         $controllerOptions = [
             'model' => $modelName,
             '--force' => $this->option('force'),
             '--no-routes' => false,
+            '--laravel' => $this->input->hasOption('laravel') ? $this->option('laravel') : false
         ];
-        try {
-            if($this->option('laravel')) {
-                $controllerOptions['--laravel'] = true;
-            };
-        } catch (InvalidArgumentException $e) {
-            // Do nothing
-        }
         $this->call('wn:controller', $controllerOptions);
 
         // generating model factory
