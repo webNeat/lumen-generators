@@ -1,6 +1,8 @@
 <?php namespace Wn\Generators\Commands;
 
 
+use InvalidArgumentException;
+
 class ControllerCommand extends BaseCommand {
 
 	protected $signature = 'wn:controller
@@ -8,7 +10,6 @@ class ControllerCommand extends BaseCommand {
 		{--no-routes= : without routes}
         {--force= : override the existing files}
         {--laravel= : Boolean (default false) Use Laravel style route definitions}
-
     ';
 
 	protected $description = 'Generates RESTful controller using the RESTActions trait';
@@ -33,13 +34,20 @@ class ControllerCommand extends BaseCommand {
         	->get();
 
         $this->save($content, "./app/Http/Controllers/{$controller}.php", "{$controller}");
-
         if(! $this->option('no-routes')){
-            $this->call('wn:route', [
+            $options = [
                 'resource' => snake_case($name, '-'),
                 '--controller' => $controller,
-                '--laravel' => $this->options('laravel')
-            ]);
+            ];
+//            try {
+//                if($this->option('laravel')) {
+//                    $options['--laravel'] = true;
+//                };
+//            } catch (InvalidArgumentException $e) {
+//                // Do nothing
+//            }
+
+            $this->call('wn:route', $options);
         }
     }
 

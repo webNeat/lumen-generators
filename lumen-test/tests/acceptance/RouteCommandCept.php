@@ -62,7 +62,9 @@ $app->get("/", function () use ($app) {
 
 
 $I->wantTo('run wn:routes in Lumen 5.3+');
-mkdir('./routes');
+if(!file_exists('./routes')) {
+    mkdir('./routes');
+}
 $I->writeToFile('./routes/web.php', '<?php
 
 /*

@@ -1,5 +1,6 @@
 <?php namespace Wn\Generators\Commands;
 
+use InvalidArgumentException;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -25,7 +26,7 @@ class ResourcesCommand extends BaseCommand {
         foreach ($content as $model => $i){
             $i = $this->getResourceParams($model, $i);
 
-            $this->call('wn:resource', [
+            $options = [
                 'name' => $i['name'],
                 'fields' => $i['fields'],
                 '--add' => $i['add'],
@@ -35,8 +36,17 @@ class ResourcesCommand extends BaseCommand {
                 '--belongs-to-many' => $i['belongsToMany'],
                 '--path' => $this->option('path'),
                 '--force' => $this->option('force'),
-                '--laravel' => $this->option('laravel')
-            ]);
+            ];
+
+            try {
+                if($this->option('laravel')) {
+                    $options['--laravel'] = true;
+                };
+            } catch (InvalidArgumentException $e) {
+                // Do nothing
+            }
+
+            $this->call('wn:resource', $options);
         }
 
         // $this->call('migrate'); // actually needed for pivot seeders !

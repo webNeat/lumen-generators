@@ -1,6 +1,8 @@
 <?php namespace Wn\Generators\Commands;
 
 
+use InvalidArgumentException;
+
 class ResourceCommand extends BaseCommand {
 
     protected $signature = 'wn:resource
@@ -64,12 +66,19 @@ class ResourceCommand extends BaseCommand {
         }
 
         // generating the controller and routes
-        $this->call('wn:controller', [
+        $controllerOptions = [
             'model' => $modelName,
             '--force' => $this->option('force'),
             '--no-routes' => false,
-            '--laravel' => $this->option('laravel')
-        ]);
+        ];
+        try {
+            if($this->option('laravel')) {
+                $controllerOptions['--laravel'] = true;
+            };
+        } catch (InvalidArgumentException $e) {
+            // Do nothing
+        }
+        $this->call('wn:controller', $controllerOptions);
 
         // generating model factory
         $this->call('wn:factory', [

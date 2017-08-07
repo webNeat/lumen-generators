@@ -1,6 +1,8 @@
 <?php namespace Wn\Generators\Commands;
 
 
+use InvalidArgumentException;
+
 class RouteCommand extends BaseCommand {
 
 	protected $signature = 'wn:route
@@ -14,16 +16,41 @@ class RouteCommand extends BaseCommand {
     public function handle()
     {
         $resource = $this->argument('resource');
-        $laravelRoutes = $this->option('laravel');
-        $templateFile = 'routes';
+        $laravelRoutes = $this->input->hasOption('laravel') ? $this->option('laravel') : false;
 
-        $routesPath = './routes/web.php';
+        $templateFile = 'routes';
+        $routesPath = 'routes/web.php';
         if ($laravelRoutes) {
-            $routesPath = './routes/api.php';
             $templateFile = 'routes-laravel';
+            $routesPath = 'routes/api.php';
+            if (!$this->fs->isFile($routesPath)) {
+                $this->fs->put($routesPath, "
+                <?php
+
+                    use Illuminate\Http\Request;
+                    
+                    /*
+                    |--------------------------------------------------------------------------
+                    | API Routes
+                    |--------------------------------------------------------------------------
+                    |
+                    | Here is where you can register API routes for your application. These
+                    | routes are loaded by the RouteServiceProvider within a group which
+                    | is assigned the \"api\" middleware group. Enjoy building your API!
+                    |
+                    */
+                    
+                    Route::middleware('auth:api')->get('/user', function (Request $request) {
+                        return $request->user();
+                    });
+
+            ");
+            }
         }
-        if (! $this->fs->exists($routesPath))
-            $routesPath = './app/Http/routes.php';
+
+        if(!$this->fs->isFile($routesPath)) {
+            $routesPath = 'app/Http/routes.php';
+        }
 
         $content = $this->fs->get($routesPath);
 
