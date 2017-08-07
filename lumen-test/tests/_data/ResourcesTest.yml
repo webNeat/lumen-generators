@@ -1,0 +1,26 @@
+---
+Author:
+  belongsTo: book
+  fields:
+    name:
+      schema: string
+      tags: fillable
+Book:
+  belongsTo: librarys     # Yes I know it's misspelled...
+  hasOne: author
+  fields:
+    title:
+      schema: string
+      tags: fillable
+    published:
+      schema: date
+      tags: fillable
+Library:
+  hasMany: books
+  fields:
+    name:
+      schema: string
+      tags: fillable
+    address:
+      schema: string
+      tags: fillable
