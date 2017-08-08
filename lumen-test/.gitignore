@@ -1,5 +1,6 @@
 /vendor
 .env
+codecept.phar
 
 tests/_output/*
 
@@ -7,3 +8,4 @@ composer.lock
 tests/_output/*
 
 codecept.phar
+
