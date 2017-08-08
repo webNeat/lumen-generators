@@ -1,5 +1,6 @@
 <?php namespace Wn\Generators\Commands;
 
+use InvalidArgumentException;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -9,6 +10,8 @@ class ResourcesCommand extends BaseCommand {
         {file : Path to the file containing resources declarations}
         {--path=app : where to store the model files.}
         {--force= : override the existing files}
+        {--laravel= : Use Laravel style route definitions}
+
     ';
 
     protected $description = 'Generates multiple resources from a file';
@@ -27,7 +30,7 @@ class ResourcesCommand extends BaseCommand {
             $migrationFile = date('Y_m_d_His') . '-' . str_pad($modelIndex , 3, 0, STR_PAD_LEFT) . '_' . snake_case($migrationName) . '_table';
 
 
-            $this->call('wn:resource', [
+            $options = [
                 'name' => $i['name'],
                 'fields' => $i['fields'],
                 '--add' => $i['add'],
@@ -38,7 +41,12 @@ class ResourcesCommand extends BaseCommand {
                 '--path' => $this->option('path'),
                 '--force' => $this->option('force'),
                 '--migration-file' => $migrationFile
-            ]);
+            ];
+            if ($this->option('laravel')) {
+                $options['--laravel'] = true;
+            }
+
+            $this->call('wn:resource', $options);
             $modelIndex++;
         }
 

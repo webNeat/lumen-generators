@@ -1,6 +1,8 @@
 <?php namespace Wn\Generators\Commands;
 
 
+use InvalidArgumentException;
+
 class ResourceCommand extends BaseCommand {
 
     protected $signature = 'wn:resource
@@ -15,6 +17,7 @@ class ResourceCommand extends BaseCommand {
         {--path=app : where to store the model file.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
+        {--laravel= : Use Laravel style route definitions}
     ';
 
     protected $description = 'Generates a model, migration, controller and routes for RESTful resource';
@@ -61,13 +64,16 @@ class ResourceCommand extends BaseCommand {
         if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
             $this->call('wn:controller:rest-actions');
         }
-
         // generating the controller and routes
-        $this->call('wn:controller', [
+        $controllerOptions = [
             'model' => $modelName,
             '--force' => $this->option('force'),
-            '--no-routes' => false
-        ]);
+            '--no-routes' => false,
+        ];
+        if ($this->option('laravel')) {
+            $controllerOptions['--laravel'] = true;
+        }
+        $this->call('wn:controller', $controllerOptions);
 
         // generating model factory
         $this->call('wn:factory', [
