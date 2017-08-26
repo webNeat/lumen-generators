@@ -8,4 +8,5 @@ lumen-test/app
 lumen-test/database
 lumen-test/tests/tmp
 
+.DS_Store
 .idea
