@@ -321,25 +321,32 @@ class ResourcesCommand extends BaseCommand {
 
 
         if(!empty($this->nodes[$key])) {
-            $order          = array();
+            $order = array();
             // $failed         = array();
-            $seen[$key]    = true;
 
             if($this->nodes[$key]['belongsTo']) {
                 $deps = $this->getArgumentParser('relations')->parse($this->nodes[$key]['belongsTo']);
                 foreach($deps as $dependency) {
-                    $tmp = $this->getDependencies(studly_case(str_singular($dependency['name'])), $seen);
+                    if(! $dependency['model']){
+	                    $dependency['model'] = $dependency['name'];
+	                } else if(strpos($dependency['model'], '\\') !== false ){
+	                    $dependency['model'] = substr($dependency['model'], strpos($dependency['model'], '\\')+1);
+	                }
+                    $dependency['model'] = studly_case(str_singular($dependency['model']));
+                    if ($dependency['model'] != $key) {
+                        $tmp = $this->getDependencies($dependency['model'], $seen);
 
-                    $order  = array_merge($tmp[0], $order);
-                    $seen   = $tmp[1];
+                        $order  = array_merge($order, $tmp[0]);
+                        $seen   = $tmp[1];
+                    }
 
                     // if($tmp[2] !== false) {
                     //     $failed = array_merge($tmp[2], $failed);
                     // }
                 }
             }
-
-            $order[$key]    = $this->nodes[$key];
+            $seen[$key]  = true;
+            $order[$key] = $this->nodes[$key];
             // $failed     = (count($failed) > 0) ? $failed : false;
 
             return array($order, $seen);//, $failed

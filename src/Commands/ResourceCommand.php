@@ -224,7 +224,7 @@ class ResourceCommand extends BaseCommand {
         $belongsTo = $belongsTo ? $this->getArgumentParser('relations')->parse($belongsTo) : [];
 
         $belongsTo = array_map(function($relation){
-            return array("model" => snake_case(str_singular($this->getBaseModel($relation['model'] ? $relation['model'] : $relation['name']))), "name" => $this->getBaseModel($relation['name']) . '_id', "type" => "belongsTo");
+            return array("model" => camel_case(str_singular($this->getBaseModel($relation['model'] ? $relation['model'] : $relation['name']))), "name" => snake_case(str_singular($this->getBaseModel($relation['name']))) . '_id', "type" => "belongsTo");
         }, $belongsTo);
 
         if ($withMorph) {
@@ -247,9 +247,9 @@ class ResourceCommand extends BaseCommand {
     protected function migrationKeys() {
         return array_map(function($name) {
             return [
-                'name' => $name['name'],
+                'name' => snake_case($name['name']),
                 'column' => '',
-                'table' => $name['model'],
+                'table' => snake_case(str_plural($name['model'])),
                 'on_delete' => '',
                 'on_update' => ''
             ];

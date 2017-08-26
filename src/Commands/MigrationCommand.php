@@ -135,13 +135,13 @@ class MigrationCommand extends BaseCommand {
             $key['column'] = 'id';
         }
         if(! $key['table']){
-            $key['table'] = str_plural(substr($key['name'], 0, count($key['name']) - 4));
+            $key['table'] = substr($key['name'], 0, count($key['name']) - 4);
         }
 
         $constraint = $this->getTemplate('migration/foreign-key')
             ->with([
                 'name' => $key['name'],
-                'table' => $key['table'],
+                'table' => snake_case(str_plural($key['table'])),
                 'column' => $key['column']
             ])
             ->get();
