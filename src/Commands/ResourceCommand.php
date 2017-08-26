@@ -204,6 +204,14 @@ class ResourceCommand extends BaseCommand {
         }, $this->fields);
     }
 
+    protected function getBaseModel($path) {
+        $index = strrpos($path, "\\");
+        if($index) {
+            return substr($path, $index + 1);
+        }
+        return $path;
+    }
+
     protected function foreignKeys($withMorph = true)
     {
         $belongsTo = $this->option('belongs-to');
@@ -216,12 +224,7 @@ class ResourceCommand extends BaseCommand {
         $belongsTo = $belongsTo ? $this->getArgumentParser('relations')->parse($belongsTo) : [];
 
         $belongsTo = array_map(function($relation){
-            $name = $relation['model'] ? $relation['model'] : $relation['name'];
-            $index = strrpos($name, "\\");
-            if($index) {
-                $name = substr($name, $index + 1);
-            }
-            return array("name" => snake_case(str_singular($name)) . '_id', "type" => "belongsTo");
+            return array("model" => snake_case(str_singular($this->getBaseModel($relation['model'] ? $relation['model'] : $relation['name']))), "name" => $this->getBaseModel($relation['name']) . '_id', "type" => "belongsTo");
         }, $belongsTo);
 
         if ($withMorph) {
@@ -233,7 +236,7 @@ class ResourceCommand extends BaseCommand {
 
             // $morphed = [];
             // array_walk_recursive($morphTo, function($a) use (&$morphed) { $morphed[] = $a; });
-            $morphed = call_user_func_array('array_merge', $morphTo);
+            $morphed = !empty($morphTo) ? call_user_func_array('array_merge', $morphTo) : array();
 
             return array_merge($belongsTo, $morphed);
         }
@@ -246,7 +249,7 @@ class ResourceCommand extends BaseCommand {
             return [
                 'name' => $name['name'],
                 'column' => '',
-                'table' => '',
+                'table' => $name['model'],
                 'on_delete' => '',
                 'on_update' => ''
             ];

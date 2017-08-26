@@ -377,7 +377,7 @@ class ResourcesCommand extends BaseCommand {
             foreach($relations as $relation) {
                 switch($type) {
                     case "belongsTo":
-                        $rModel = $relation['name']; break;
+                        $rModel = $relation['model']?$relation['model']:$relation['name']; break;
                 }
 
                 $search = array_search(studly_case(str_singular($rModel)), $keys);

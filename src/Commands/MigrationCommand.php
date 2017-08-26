@@ -23,6 +23,12 @@ class MigrationCommand extends BaseCommand {
         $name = 'Create' . ucwords(camel_case($table));
         $snakeName = snake_case($name);
 
+        $file = $this->option('file');
+        if(! $file){
+            $name = "Migration".sprintf('%06d', self::$COUNTER++) . $name;
+            $file = date('Y_m_d_His_') . snake_case($name) . '_table';
+        }
+
         $content = $this->getTemplate('migration')
             ->with([
                 'table' => $table,
