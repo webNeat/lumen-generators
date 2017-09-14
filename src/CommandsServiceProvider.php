@@ -16,7 +16,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerResourcesCommand();
         $this->registerPivotTableCommand();
         $this->registerFactoryCommand();
-        // registerSeederCommand
+        $this->registerSeederCommand();
         // registerPivotSeederCommand
         // registerTestCommand
     }

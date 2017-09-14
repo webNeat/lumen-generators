@@ -1,7 +1,7 @@
 /vendor/
 /about/
 *.sublime-*
-
+.idea
 tests/_output/*
 
 lumen-test/app
