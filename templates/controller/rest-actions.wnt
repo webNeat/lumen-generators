@@ -53,6 +53,12 @@ trait RESTActions {
 
     protected function respond($status, $data = [])
     {
+        if($status == Response::HTTP_NO_CONTENT){
+			return response(null,Response::HTTP_NO_CONTENT);
+		}
+		if($status == Response::HTTP_NOT_FOUND){
+			return response(['message'=>'resource not found'],Response::HTTP_NOT_FOUND);
+		}
         return response()->json($data, $status);
     }
 
