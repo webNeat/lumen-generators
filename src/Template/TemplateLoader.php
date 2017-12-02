@@ -20,11 +20,7 @@ class TemplateLoader {
 	public function load($name)
 	{
 		if(! isset($this->loaded[$name])){
-			$path = __DIR__ . "/../../templates/{$name}.wnt";
-			
-			if($customPath = config("lumen-generators.custom_templates.{$name}")){
-			    $path = $customPath;
-            }
+			$path = config("lumen-generators.custom_templates.{$name}", __DIR__ . "/../../templates/{$name}.wnt");
 			
 			try {
 				$this->loaded[$name] = $this->fs->get($path);

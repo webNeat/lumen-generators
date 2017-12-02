@@ -30,6 +30,7 @@ class ModelCommand extends BaseCommand {
             ->with([
                 'name' => $name,
                 'namespace' => $this->getNamespace(),
+                'required' => $this->getFieldByRuleAsArrayFields('required'),
                 'fillable' => $this->getAsArrayFields('fillable'),
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
@@ -40,6 +41,26 @@ class ModelCommand extends BaseCommand {
             ->get();
 
         $this->save($content, "./{$path}/{$name}.php", "{$name} model");
+    }
+
+    protected function getFieldByRuleAsArrayFields($rule, $allowPartialMatch = false)
+    {
+        $rules = $this->getRules(false);
+        $fields = [];
+                
+        foreach($rules as $ruleId => $ruleData){
+            $fieldRules = explode(',', $ruleData['rule']);
+            
+            foreach($fieldRules as $fieldRule){
+                if($fieldRule === $rule || str_contains($fieldRule, $rule)){
+                    $fields[] = $ruleData['name'];
+                }
+            }
+        }
+        
+        return implode(', ', array_map(function($item){
+            return '"' . $item . '"';
+        }, $fields));
     }
 
     protected function getAsArrayFields($arg, $isOption = true)
@@ -99,7 +120,7 @@ class ModelCommand extends BaseCommand {
         return $relations;
     }
 
-    protected function getRules()
+    protected function getRules($inTemplate = true)
     {
         $rules = $this->option('rules');
         if(! $rules){
@@ -109,13 +130,17 @@ class ModelCommand extends BaseCommand {
         if(! $this->option('parsed')){
             $items = $this->getArgumentParser('rules')->parse($rules);
         }
+        $model = $this->argument('name');
         $rules = [];
         $template = $this->getTemplate('model/rule');
         foreach ($items as $item) {
-            $rules[] = $template->with($item)->get();
+            $rules[] = $template->with(array_merge(
+                $item,
+                [ 'model' => $model ]
+            ))->get();
         }
 
-        return implode(PHP_EOL, $rules);
+        return $inTemplate ? implode(PHP_EOL, $rules) : $items;
     }
 
     protected function getAdditional()
