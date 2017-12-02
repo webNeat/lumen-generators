@@ -4,12 +4,20 @@ use Illuminate\Support\ServiceProvider;
 
 class CommandsServiceProvider extends ServiceProvider
 {
-
+    public function boot()
+    {
+        $configPath = __DIR__.'/../config/lumen-generators.php';
+        $this->publishes([
+            $configPath => base_path('config/lumen-generators.php'),
+        ]);
+    }
+    
     public function register()
     {
         $configPath = __DIR__.'/../config/lumen-generators.php';
         $this->mergeConfigFrom($configPath, 'lumen-generators');
-        
+
+        $this->registerPublishCommand();
         $this->registerModelCommand();
         $this->registerControllerRestActionsCommand();
         $this->registerControllerCommand();
@@ -22,6 +30,13 @@ class CommandsServiceProvider extends ServiceProvider
         // registerSeederCommand
         // registerPivotSeederCommand
         // registerTestCommand
+    }
+
+    protected function registerPublishCommand(){
+        $this->app->singleton('command.wn.publish', function($app){
+            return $app['Wn\Generators\Commands\PublishCommand'];
+        });
+        $this->commands('command.wn.publish');
     }
 
     protected function registerModelCommand(){
