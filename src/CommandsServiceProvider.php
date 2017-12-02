@@ -7,6 +7,9 @@ class CommandsServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $configPath = __DIR__.'/../config/lumen-generators.php';
+        $this->mergeConfigFrom($configPath, 'lumen-generators');
+        
         $this->registerModelCommand();
         $this->registerControllerRestActionsCommand();
         $this->registerControllerCommand();
