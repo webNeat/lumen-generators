@@ -20,12 +20,8 @@ class CreateProjectTagTable extends Migration
             $table->increments(\'id\');
             $table->integer(\'project_id\')->unsigned()->index();
             $table->integer(\'tag_id\')->unsigned()->index();
-            $table->foreign(\'project_id\')
-                ->references(\'id\')
-                ->on(\'projects\');
-            $table->foreign(\'tag_id\')
-                ->references(\'id\')
-                ->on(\'tags\');
+            $table->foreign(\'project_id\')->references(\'id\')->on(\'projects\');
+            $table->foreign(\'tag_id\')->references(\'id\')->on(\'tags\');
             $table->timestamps();
         });
     }

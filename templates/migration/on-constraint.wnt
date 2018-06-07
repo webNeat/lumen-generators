@@ -1,1 +1,1 @@
-                ->on{{event}}('{{action}}')
+->on{{event}}('{{action}}')

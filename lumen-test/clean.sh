@@ -1,15 +1,20 @@
+#!/usr/bin/env bash
+parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+
+cd "$parent_path"
+
 # models
-rm app/*.php 2> /dev/null
+rm ./app/*.php 2> /dev/null
 
 # migrations
-rm database/migrations/*.php 2> /dev/null
+rm ./database/migrations/*.php 2> /dev/null
 
 # routes
 echo "<?php
 
 \$app->get(\"/\", function () use (\$app) {
     return \$app->welcome();
-});" > app/Http/routes.php
+});" > ./app/Http/routes.php
 
 echo "<?php
 /*
@@ -17,10 +22,10 @@ echo "<?php
 |   ***** DUMMY ROUTES FOR TESTING ONLY *****
 |------------------------------------------
 */
-" > routes/api.php
+" > ./routes/api.php
 
 # Controllers
-rm app/Http/Controllers/*.php 2> /dev/null
+rm ./app/Http/Controllers/*.php 2> /dev/null
 echo "<?php
 
 namespace App\Http\Controllers;
@@ -31,7 +36,7 @@ class Controller extends BaseController
 {
     //
 }
-" > app/Http/Controllers/Controller.php
+" > ./app/Http/Controllers/Controller.php
 
 # factories
 echo "<?php
@@ -44,8 +49,8 @@ echo "<?php
         'remember_token' => str_random(10),
     ];
 });
-" > database/factories/ModelFactory.php
+" > ./database/factories/ModelFactory.php
 
 # database
-rm database/database.sqlite 2> /dev/null
-touch database/database.sqlite
+rm ./database/database.sqlite 2> /dev/null
+touch ./database/database.sqlite

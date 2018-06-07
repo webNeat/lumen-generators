@@ -74,7 +74,10 @@ class MigrationCommand extends BaseCommand {
             $lines[] = $this->spaces(12) . "\$table->{$add}();";
         }
 
-        return implode(PHP_EOL, $lines);
+        if(!empty($lines))
+            return implode(PHP_EOL, $lines);
+        else
+            return "";
     }
 
     protected function getFieldDeclaration($parts)
@@ -85,7 +88,7 @@ class MigrationCommand extends BaseCommand {
         $parts = array_map(function($part){
             return '->' . $part['name'] . '(' . implode(', ', $part['args']) . ')';
         }, $parts);
-        return "            \$table" . implode('', $parts) . ';';
+        return $this->spaces(12) . "\$table" . implode('', $parts) . ';';
     }
 
     protected function getConstraints()
@@ -114,10 +117,13 @@ class MigrationCommand extends BaseCommand {
             $key['column'] = 'id';
         }
         if(! $key['table']){
-            $key['table'] = str_plural(substr($key['name'], 0, count($key['name']) - 4));
+            $key['table'] = str_plural(substr($key['name'], 0, strlen($key['name']) - 3));
         }
 
-        $constraint = $this->getTemplate('migration/foreign-key')
+        // Indent the constraint properly
+        $constraint = $this->spaces(12);
+
+        $constraint .= $this->getTemplate('migration/foreign-key')
             ->with([
                 'name' => $key['name'],
                 'table' => $key['table'],
@@ -126,7 +132,7 @@ class MigrationCommand extends BaseCommand {
             ->get();
 
         if($key['on_delete']){
-            $constraint .= PHP_EOL . $this->getTemplate('migration/on-constraint')
+            $constraint .= $this->getTemplate('migration/on-constraint')
                 ->with([
                     'event' => 'Delete',
                     'action' => $key['on_delete']
@@ -135,7 +141,7 @@ class MigrationCommand extends BaseCommand {
         }
 
         if($key['on_update']){
-            $constraint .= PHP_EOL . $this->getTemplate('migration/on-constraint')
+            $constraint .= $this->getTemplate('migration/on-constraint')
                 ->with([
                     'event' => 'Update',
                     'action' => $key['on_update']
