@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-    	"php": ">=5.5.0",
+    	"php": ">=7.0.0",
         "illuminate/console": "^5.1",
         "illuminate/filesystem": "^5.1",
         "fzaninotto/faker": "^1.5"

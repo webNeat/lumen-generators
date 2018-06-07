@@ -1,6 +1,10 @@
 <?php
 $I = new AcceptanceTester($scenario);
 
+$spaces = function($n) {
+    str_repeat(' ', $n);
+};
+
 $I->wantTo('generate a migration without schema');
 $I->runShellCommand('php artisan wn:migration tasks --add=timestamps --file=create_tasks');
 $I->seeInShellOutput('tasks migration generated');
@@ -100,16 +104,8 @@ $I->runShellCommand('php artisan wn:migration tasks --file=create_tasks --keys="
 $I->seeInShellOutput('tasks migration generated');
 $I->seeFileFound('./database/migrations/create_tasks.php');
 $I->openFile('./database/migrations/create_tasks.php');
-$I->seeInThisFile(
-"\$table->foreign('category_type_id')\n".
-"                ->references('id')\n".
-"                ->on('category_types');"
-);
-$I->seeInThisFile(
-"\$table->foreign('user_id')\n".
-"                ->references('identifier')\n".
-"                ->on('members')". PHP_EOL .
-"                ->onDelete('cascade');");
+$I->seeInThisFile($spaces(12)."\$table->foreign('category_type_id')->references('id')->on('category_types');");
+$I->seeInThisFile($spaces(12)."\$table->foreign('user_id')->references('identifier')->on('members')->onDelete('cascade');");
 $I->deleteFile('./database/migrations/create_tasks.php');
 
 $I->wantTo('generate a migration with additional columns');

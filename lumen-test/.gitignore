@@ -1,6 +1,5 @@
 /vendor
 .env
-codecept.phar
 
 tests/_output/*
 

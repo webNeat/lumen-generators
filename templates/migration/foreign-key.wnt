@@ -1,3 +1,1 @@
-            $table->foreign('{{name}}')
-                ->references('{{column}}')
-                ->on('{{table}}')
+$table->foreign('{{name}}')->references('{{column}}')->on('{{table}}')

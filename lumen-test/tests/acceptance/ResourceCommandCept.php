@@ -53,13 +53,9 @@ $I->seeInThisFile("Schema::create('task_categories', function(Blueprint \$table)
 "            \$table->text('descr')->nullable();" . PHP_EOL .
 "            \$table->timestamp('due');" . PHP_EOL .
 "            \$table->integer('project_id')->unsigned();" . PHP_EOL.
-"            \$table->integer('user_id')->unsigned();\n" .
-"            \$table->foreign('project_id')\n".
-"                ->references('id')\n".
-"                ->on('projects');" . PHP_EOL .
-"            \$table->foreign('user_id')\n".
-"                ->references('id')\n".
-"                ->on('users');\n".
+"            \$table->integer('user_id')->unsigned();" . PHP_EOL .
+"            \$table->foreign('project_id')->references('id')->on('projects');" . PHP_EOL .
+"            \$table->foreign('user_id')->references('id')->on('users');". PHP_EOL .
 "            \$table->timestamps();");
 
 $I->deleteFile('./database/migrations/create_task_categories.php');
