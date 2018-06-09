@@ -29,7 +29,8 @@ class ControllerCommand extends BaseCommand {
         $content = $this->getTemplate('controller')
         	->with([
         		'name' => $controller,
-        		'model' => $model
+        		'model' => $model,
+                'model_name' => $name
         	])
         	->get();
 
