@@ -49,6 +49,10 @@ Add the generators package to your composer.json by running the command:
 
 `composer require wn/lumen-generators`
 
+Make sure the line below is uncommented in `bootstrap/app.php` file:
+
+`$app->register(App\Providers\AppServiceProvider::class);`
+
 Then add the service provider in the file `app/Providers/AppServiceProvider.php`like the following:
 
 ```php
