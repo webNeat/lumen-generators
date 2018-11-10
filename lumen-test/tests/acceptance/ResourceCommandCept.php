@@ -86,11 +86,11 @@ $I->deleteFile('./app/Http/Controllers/TaskCategoriesController.php');
 // Checking routes
 $I->openFile('./app/Http/routes.php');
 $I->seeInThisFile('
-$app->get(\'task-category\', \'TaskCategoriesController@all\');
-$app->get(\'task-category/{id}\', \'TaskCategoriesController@get\');
-$app->post(\'task-category\', \'TaskCategoriesController@add\');
-$app->put(\'task-category/{id}\', \'TaskCategoriesController@put\');
-$app->delete(\'task-category/{id}\', \'TaskCategoriesController@remove\');');
+$router->get(\'task-category\', \'TaskCategoriesController@all\');
+$router->get(\'task-category/{id}\', \'TaskCategoriesController@get\');
+$router->post(\'task-category\', \'TaskCategoriesController@add\');
+$router->put(\'task-category/{id}\', \'TaskCategoriesController@put\');
+$router->delete(\'task-category/{id}\', \'TaskCategoriesController@remove\');');
 $I->writeToFile('./app/Http/routes.php', '<?php
 
 /*
@@ -104,8 +104,8 @@ $I->writeToFile('./app/Http/routes.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->welcome();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
 
