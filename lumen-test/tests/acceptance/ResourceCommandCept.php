@@ -11,13 +11,13 @@ $I->openFile('./app/TaskCategory.php');
 
 $I->seeInThisFile('namespace App;');
 $I->seeInThisFile('class TaskCategory extends Model');
-$I->seeInThisFile('protected $fillable = ["name", "descr", "due", "project_id", "user_id"];');
+$I->seeInThisFile('protected $fillable = ["name", "descr", "due", "project_id", "creator_id"];');
 $I->seeInThisFile('protected $dates = ["due"];');
 $I->seeInThisFile(
 "public static \$rules = [\n".
 "        \"name\" => \"requied\"," . PHP_EOL .
 "        \"project_id\" => \"required|numeric\"," . PHP_EOL .
-"        \"user_id\" => \"required|numeric\",\n".
+"        \"creator_id\" => \"required|numeric\",\n".
 "    ];");
 $I->seeInThisFile(
 '    public function tags()
@@ -53,11 +53,11 @@ $I->seeInThisFile("Schema::create('task_categories', function(Blueprint \$table)
 "            \$table->text('descr')->nullable();" . PHP_EOL .
 "            \$table->timestamp('due');" . PHP_EOL .
 "            \$table->integer('project_id')->unsigned();" . PHP_EOL.
-"            \$table->integer('user_id')->unsigned();\n" .
+"            \$table->integer('creator_id')->unsigned();\n" .
 "            \$table->foreign('project_id')\n".
 "                ->references('id')\n".
 "                ->on('projects');" . PHP_EOL .
-"            \$table->foreign('user_id')\n".
+"            \$table->foreign('creator_id')\n".
 "                ->references('id')\n".
 "                ->on('users');\n".
 "            \$table->timestamps();");
@@ -75,7 +75,7 @@ $I->openFile('./app/Http/Controllers/TaskCategoriesController.php');
 
 $I->seeInThisFile('class TaskCategoriesController extends Controller {
 
-    const MODEL = "App\TaskCategory";
+    const MODEL = \'App\\TaskCategory\';
 
     use RESTActions;
 

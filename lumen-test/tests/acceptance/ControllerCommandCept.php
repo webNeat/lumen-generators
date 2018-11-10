@@ -10,7 +10,7 @@ $I->seeFileContentsEqual('<?php namespace App\Http\Controllers;
 
 class TestsController extends Controller {
 
-    const MODEL = "App\\Test";
+    const MODEL = \'App\\Test\';
 
     use RESTActions;
 
@@ -27,7 +27,7 @@ $I->seeFileContentsEqual('<?php namespace App\Http\Controllers;
 
 class CategoriesController extends Controller {
 
-    const MODEL = "App\\Models\\Category";
+    const MODEL = \'App\\Models\\Category\';
 
     use RESTActions;
 

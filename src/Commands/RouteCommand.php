@@ -25,8 +25,8 @@ class RouteCommand extends BaseCommand {
             $templateFile = 'routes-laravel';
             $routesPath = $this->option('path') ?: 'routes/api.php';
 			if (!$this->fs->isFile($routesPath)) {
-				if (!$this->fs->isDirectory($this->fs->dirname($routesPath))) {
-					$this->fs->makeDirectory($this->fs->dirname($routesPath));
+				if (!$this->fs->isDirectory(\dirname($routesPath))) {
+					$this->fs->makeDirectory(\dirname($routesPath));
 				}
 				$this->fs->put($routesPath, "
 	<?php
