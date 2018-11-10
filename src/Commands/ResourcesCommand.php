@@ -34,6 +34,15 @@ class ResourcesCommand extends BaseCommand {
     {
         $files = $this->argument('files');
         $nodes = [];
+
+        if (empty($files)) {
+            $this->error("No resource file(s) supplied!");
+            return;
+        }
+        if (is_string($files)) {
+            $files = [ $files ];
+        }
+
         foreach ($files as $file) {
             $nodes = $this->mergeNodes($nodes, $this->readFile($file), $this->option('force-redefine'));
         }
@@ -133,11 +142,11 @@ class ResourcesCommand extends BaseCommand {
     protected function mergeNode($nodes, $toMerge, $forceRedefinition = false) {
         if (empty($nodes[$toMerge['uniquename']]) || $forceRedefinition) {
             if (!empty($nodes[$toMerge['uniquename']])) {
-                $this->checkError($toMerge['uniquename'] . ": forced to redefine (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", redefined from file ".$file.")");
+                $this->checkError($toMerge['uniquename'] . ": forced to redefine (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", redefined from file ".$toMerge['filename'].")");
             }
             $nodes[$toMerge['uniquename']] = $toMerge;
         } else {
-            $this->checkError($toMerge['uniquename'] . ": already defined (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", trying to redefine from file ".$file."; Use --force-redefine to force redefinition)");
+            $this->checkError($toMerge['uniquename'] . ": already defined (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", trying to redefine from file ".$toMerge['filename']."; Use --force-redefine to force redefinition)");
         }
 
         return $nodes;
@@ -258,11 +267,20 @@ class ResourcesCommand extends BaseCommand {
         return $i;
     }
 
-    protected function belongsTo($name, $modelName, $belongsTo)
+    protected parseRelations($parser, $relations, $callback)
     {
         $parsedRelations = [];
-        $relations = $this->getArgumentParser('relations')->parse($belongsTo);
+        $relations = $this->getArgumentParser($parser)->parse($relations);
         foreach ($relations as $relation){
+            $parsedRelations[] = $callback($relation);
+        }
+
+        return $parsedRelations;
+    }
+
+    protected function belongsTo($name, $modelName, $belongsTo)
+    {
+        return $this->parseRelations('relations', $belongsTo, function($relation) use ($name, $modelName) {
             if(! $relation['model']){
                 $table = snake_case($relation['name']);
             } else {
@@ -272,50 +290,38 @@ class ResourcesCommand extends BaseCommand {
             $tables = [ str_singular($table), $name ];
             sort($tables);
             $tables[] = $modelName;
-            $parsedRelations[] = $tables;
-        }
-
-        return $parsedRelations;
+            return $tables;
+        });
     }
 
     protected function morphToMany($modelName, $morphToMany)
     {
-        $parsedRelations = [];
-        $relations = $this->getArgumentParser('relations-morphMany')->parse();
-        foreach ($relations as $relation){
+        return $this->parseRelations('relations-morphMany', $morphToMany, function($relation) use ($modelName) {
             if(! $relation['through']){
-                $morphable = snake_case($this->extractClassName($relation['model']));
-                $model = snake_case($relation['name']);
+                $name = snake_case($relation['name']);
             } else {
-                $morphable = snake_case($this->extractClassName($relation['through']));
-                $model = snake_case($this->extractClassName($relation['model']));
+                $name = snake_case($this->extractClassName($relation['model']));
             }
 
-            $tables = [ str_singular($model), str_singular($morphable), $modelName ];
-            $parsedRelations[] = $tables;
-        }
-
-        return $parsedRelations;
+            return $this->getMorphableRelation($relation, $name, $modelName);
+        });
     }
 
     protected function morphedByMany($name, $modelName, $morphedByMany)
     {
-        $parsedRelations = [];
-        $relations = $this->getArgumentParser('relations-morphMany')->parse($morphedByMany);
-        foreach ($relations as $relation){
-            $table = '';
+        return $this->parseRelations('relations-morphMany', $morphedByMany, function($relation) use ($name, $modelName) {
+            return $this->getMorphableRelation($relation, $name, $modelName);
+        });
+    }
 
-            if(! $relation['through']){
-                $morphable = snake_case($this->extractClassName($relation['model']));
-            } else {
-                $morphable = snake_case($this->extractClassName($relation['through']));
-            }
-
-            $tables = [ str_singular($name), str_singular($morphable), $modelName ];
-            $parsedRelations[] = $tables;
+    protected function getMorphableRelation($relation, $relationName, $modelName) {
+        if(! $relation['through']){
+            $morphable = snake_case($this->extractClassName($relation['model']));
+        } else {
+            $morphable = snake_case($this->extractClassName($relation['through']));
         }
 
-        return $parsedRelations;
+        return [ str_singular($relationName), str_singular($morphable), $modelName ];
     }
 
     protected function serializeField($field)
@@ -421,13 +427,7 @@ class ResourcesCommand extends BaseCommand {
             $position = array_search($model, $keys);
             $relations = $this->getArgumentParser('relations')->parse($relations);
             foreach($relations as $relation) {
-                switch($type) {
-                    case "belongsTo":
-                        $rModel = $relation['model'] ? $relation['model'] : $relation['name'];
-                        break;
-                    default: continue;
-                }
-
+                $rModel = $relation['model'] ? $relation['model'] : $relation['name'];
                 $search = array_search(studly_case(str_singular($rModel)), $keys);
                 if (($search === false || $search > $position) && !class_exists($this->prependNamespace($rModel)) && !class_exists($this->prependNamespace($rModel, 'App'))) {
                     $this->checkError(studly_case(str_singular($rModel)) . ": undefined (used in " . $type . "-relationship of model " . $model . " in file " . $file . ")");
@@ -440,29 +440,28 @@ class ResourcesCommand extends BaseCommand {
         }
     }
 
-    protected function checkPivotRelations($nodes, $relations, $rType) {
+    protected function checkPivotRelations($nodes, $relations, $relationType) {
         if ($relations) {
             foreach($relations as $relation) {
                 $relation['0'] = studly_case(str_singular($relation['0']));
                 $relation['1'] = studly_case(str_singular($relation['1']));
                 $relation['2'] = studly_case(str_singular($relation['2']));
 
-                if (empty($nodes[$relation['0']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['0']))) && !class_exists('App\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkError($relation['0'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
-                } else if (class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
-                } else if (class_exists('App\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
-                }
-
-                if ($rType == "pivot" && empty($nodes[$relation['1']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['1']))) && !class_exists('App\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkError($relation['1'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
-                } else if ($rType == "pivot" && class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
-                } else if ($rType == "pivot" && class_exists('App\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
+                $this->checkRelation($nodes, $relationType, $relation['0'], $relation['2']);
+                if ($relationType == "pivot") {
+                    $this->checkRelation($nodes, $relationType, $relation['1'], $relation['2']);
                 }
             }
+        }
+    }
+
+    protected function checkRelation($nodes, $relationType, $relation, $model) {
+        if (empty($nodes[$relation]) && !class_exists($this->getNamespace() . '\\' . $relation) && !class_exists('App\\' . $relation)) {
+            $this->checkError($relation . ": undefined (used in " . $relationType . "-based relationship of model " . $model . " in file " . $nodes[$model]['filename'] . ")");
+        } else if (class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation)))) {
+            $this->checkInfo(studly_case(str_singular($relation)) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $relationType . "-based relationship of model " . $model . " in file " . $nodes[$model]['filename'] . ")");
+        } else if (class_exists('App\\' . ucwords(camel_case($relation)))) {
+            $this->checkInfo(studly_case(str_singular($relation)) . ": already defined in Namespace App\\ (used in " . $relationType . "-based relationship of model " . $model . " in file " . $nodes[$model]['filename'] . ")");
         }
     }
 

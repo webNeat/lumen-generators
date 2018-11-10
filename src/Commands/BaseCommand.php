@@ -49,12 +49,12 @@ class BaseCommand extends Command {
         }
     }
 
-    protected function spaces($n)
+    protected function spaces($n): string
     {
         return str_repeat(' ', $n);
     }
 
-    protected function getNamespace($path = false)
+    protected function getNamespace(string $path = null): string
     {
 		if (! $path) {
 			$path = $this->option('path');
@@ -65,7 +65,7 @@ class BaseCommand extends Command {
         })));
     }
 
-    protected function parseValue($value, $parser)
+    protected function parseValue($value, string $parser)
     {
         if(! $value){
             return false;
@@ -78,7 +78,7 @@ class BaseCommand extends Command {
         return $value;
     }
 
-    protected function prependNamespace($value, $path = false)
+    protected function prependNamespace(string $value, string $path = null): string
     {
         if (strpos($value, '\\') === false) {
             return $this->getNamespace($path) . '\\' . studly_case(str_singular($value));
@@ -87,7 +87,8 @@ class BaseCommand extends Command {
         return $value;
     }
 
-    protected function extractClassName($fqClassName) {
+    protected function extractClassName(string $fqClassName): string
+    {
         $names = array_reverse(explode("\\", $fqClassName));
         return $names[0];
     }
