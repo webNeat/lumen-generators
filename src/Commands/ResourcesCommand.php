@@ -267,7 +267,7 @@ class ResourcesCommand extends BaseCommand {
         return $i;
     }
 
-    protected parseRelations($parser, $relations, $callback)
+    protected function parseRelations($parser, $relations, $callback)
     {
         $parsedRelations = [];
         $relations = $this->getArgumentParser($parser)->parse($relations);
