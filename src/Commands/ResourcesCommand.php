@@ -373,10 +373,6 @@ class ResourcesCommand extends BaseCommand {
         }
     }
 
-    protected function getNamespace() {
-    	return str_replace(' ', '\\', ucwords(str_replace('/', ' ', $this->option('path'))));
-    }
-
     protected function checkRelations($relations, $type, $file, $model, $keys) {
         if ($relations) {
             $position = array_search($model, $keys);

@@ -5,9 +5,11 @@ use InvalidArgumentException;
 
 class ControllerCommand extends BaseCommand {
 
+	const DEFAULT_PATH = "app/Http/Controllers";
+
 	protected $signature = 'wn:controller
         {model : Name of the model (with namespace if not App)}
-		{--path=app/Http/Controllers : where to store the controllers file.}
+		{--path='.ControllerCommand::DEFAULT_PATH.' : where to store the controllers file.}
 		{--no-routes= : without routes}
         {--routes= : where to store the routes.}
         {--force= : override the existing files}
@@ -33,7 +35,7 @@ class ControllerCommand extends BaseCommand {
         		'name' => $controller,
         		'model' => $model,
 				'namespace' => $this->getNamespace(),
-				'use' => ($this->getNamespace() != "App\\Http\\Controllers"?'use App\Http\Controllers\Controller;'.PHP_EOL.'use App\Http\Controllers\RESTActions;'.PHP_EOL:'')
+				'use' => ($this->getNamespace() != $this->getDefaultNamespace()?'use '.$this->getDefaultNamespace().'\Controller;'.PHP_EOL.'use '.$this->getDefaultNamespace().'\RESTActions;'.PHP_EOL:'')
         	])
         	->get();
 
@@ -43,7 +45,6 @@ class ControllerCommand extends BaseCommand {
             $options = [
                 'resource' => snake_case($name, '-'),
                 '--controller' => $controller,
-				'--controller-namespace' => ($this->getNamespace() != "App\\Http\\Controllers"?$this->getNamespace():''),
             ];
 
             if ($this->option('laravel')) {
@@ -52,14 +53,16 @@ class ControllerCommand extends BaseCommand {
             if ($this->option('routes')) {
                 $options['--path'] = $this->option('routes');
             }
+            if ($this->getNamespace() != $this->getDefaultNamespace()) {
+                $options['--controller-namespace'] = $this->getNamespace();
+            }
 
             $this->call('wn:route', $options);
         }
     }
 
-    protected function getNamespace()
-    {
-    	return str_replace(' ', '\\', ucwords(trim(str_replace('/', ' ', $this->option('path')))));
-    }
+	protected function getDefaultNamespace() {
+		return $this->getNamespace(ControllerCommand::DEFAULT_PATH);
+	}
 
 }

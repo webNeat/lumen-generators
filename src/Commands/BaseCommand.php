@@ -54,4 +54,13 @@ class BaseCommand extends Command {
         return str_repeat(' ', $n);
     }
 
+    protected function getNamespace($path = false)
+    {
+		if (! $path) {
+			$path = $this->option('path');
+		}
+
+    	return str_replace(' ', '\\', ucwords(trim(str_replace('/', ' ', $path))));
+    }
+
 }

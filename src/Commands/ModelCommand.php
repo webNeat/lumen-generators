@@ -60,11 +60,6 @@ class ModelCommand extends BaseCommand {
         }, $arg));
     }
 
-    protected function getNamespace()
-    {
-    	return str_replace(' ', '\\', ucwords(str_replace('/', ' ', $this->option('path'))));
-    }
-
     protected function getRelations()
     {
         $relations = array_merge([],

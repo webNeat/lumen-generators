@@ -100,7 +100,7 @@ class ResourceCommand extends BaseCommand {
 
         // generating model factory
         $this->call('wn:factory', [
-            'model' => $this->getNamespace().$modelName,
+            'model' => $this->getNamespace().'\\'.$modelName,
             '--file' => './database/factories/'.str_plural($modelName).'.php',
             '--fields' => $this->factoryFields(),
             '--force' => $this->option('force'),
@@ -112,11 +112,6 @@ class ResourceCommand extends BaseCommand {
         //     'model' => 'App\\' . $modelName
         // ]);
 
-    }
-
-    protected function getNamespace()
-    {
-    	return str_replace(' ', '\\', ucwords(trim(str_replace('/', ' ', $this->option('path'))))).'\\';
     }
 
     protected function parseFields()

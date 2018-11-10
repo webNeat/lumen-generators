@@ -1,10 +1,10 @@
 /**
  * Routes for resource {{namespace}}/{{resource}}
  */
- $app->group(['namespace' => '{{namespace}}', 'prefix' => '{{resource}}'], function ($app) {
-     $app->get('/', '{{controller}}@all');
-     $app->get('/{id}', '{{controller}}@get');
-     $app->post('/', '{{controller}}@add');
-     $app->put('/{id}', '{{controller}}@put');
-     $app->delete('/{id}', '{{controller}}@remove');
+ $router->group(['namespace' => '{{namespace}}', 'prefix' => '{{resource}}'], function ($router) {
+     $router->get('/', '{{controller}}@all');
+     $router->get('/{id}', '{{controller}}@get');
+     $router->post('/', '{{controller}}@add');
+     $router->put('/{id}', '{{controller}}@put');
+     $router->delete('/{id}', '{{controller}}@remove');
  });
