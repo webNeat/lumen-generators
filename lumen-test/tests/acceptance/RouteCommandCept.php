@@ -6,11 +6,11 @@ $I->runShellCommand('php artisan wn:route project-type');
 $I->seeInShellOutput('project-type routes generated');
 $I->openFile('./app/Http/routes.php');
 $I->seeInThisFile("
-\$app->get('project-type', 'ProjectTypesController@all');
-\$app->get('project-type/{id}', 'ProjectTypesController@get');
-\$app->post('project-type', 'ProjectTypesController@add');
-\$app->put('project-type/{id}', 'ProjectTypesController@put');
-\$app->delete('project-type/{id}', 'ProjectTypesController@remove');
+\$router->get('project-type', 'ProjectTypesController@all');
+\$router->get('project-type/{id}', 'ProjectTypesController@get');
+\$router->post('project-type', 'ProjectTypesController@add');
+\$router->put('project-type/{id}', 'ProjectTypesController@put');
+\$router->delete('project-type/{id}', 'ProjectTypesController@remove');
 ");
 $I->writeToFile('./app/Http/routes.php', '<?php
 
@@ -25,8 +25,8 @@ $I->writeToFile('./app/Http/routes.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->welcome();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
 
@@ -36,11 +36,11 @@ $I->runShellCommand('php artisan wn:route foo --controller=customController');
 $I->seeInShellOutput('foo routes generated');
 $I->openFile('./app/Http/routes.php');
 $I->seeInThisFile("
-\$app->get('foo', 'customController@all');
-\$app->get('foo/{id}', 'customController@get');
-\$app->post('foo', 'customController@add');
-\$app->put('foo/{id}', 'customController@put');
-\$app->delete('foo/{id}', 'customController@remove');
+\$router->get('foo', 'customController@all');
+\$router->get('foo/{id}', 'customController@get');
+\$router->post('foo', 'customController@add');
+\$router->put('foo/{id}', 'customController@put');
+\$router->delete('foo/{id}', 'customController@remove');
 ");
 $I->writeToFile('./app/Http/routes.php', '<?php
 
@@ -55,8 +55,8 @@ $I->writeToFile('./app/Http/routes.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->welcome();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
 
@@ -78,8 +78,8 @@ $I->writeToFile('./routes/web.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->version();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
 
@@ -87,10 +87,10 @@ $I->runShellCommand('php artisan wn:route foo --controller=customController');
 $I->seeInShellOutput('foo routes generated');
 $I->openFile('./routes/web.php');
 $I->seeInThisFile("
-\$app->get('foo', 'customController@all');
-\$app->get('foo/{id}', 'customController@get');
-\$app->post('foo', 'customController@add');
-\$app->put('foo/{id}', 'customController@put');
-\$app->delete('foo/{id}', 'customController@remove');
+\$router->get('foo', 'customController@all');
+\$router->get('foo/{id}', 'customController@get');
+\$router->post('foo', 'customController@add');
+\$router->put('foo/{id}', 'customController@put');
+\$router->delete('foo/{id}', 'customController@remove');
 ");
 $I->deleteDir('./routes');

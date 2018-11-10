@@ -12,9 +12,18 @@ class ResourceCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--has-many-through= : hasManyThrough relationships.}
+        {--morph-to= : morphTo relationships.}
+        {--morph-many= : morphMany relationships.}
+        {--morph-to-many= : morphToMany relationships.}
+        {--morphed-by-many= : morphedByMany relationships.}
         {--migration-file= : the migration file name.}
         {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--path=app : where to store the model file.}
+        {--routes= : where to store the routes.}
+        {--no-routes : do not add routes.}
+        {--controller= : where to store the controllers file.}
+        {--no-controller : do not generate controllers.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
         {--force= : override the existing files}
         {--laravel= : Use Laravel style route definitions}
@@ -30,7 +39,7 @@ class ResourceCommand extends BaseCommand {
 
         $resourceName = $this->argument('name');
         $modelName = ucwords(camel_case($resourceName));
-        $tableName = str_plural($resourceName);
+        $tableName = snake_case(str_plural($resourceName));
 
         // generating the model
         $this->call('wn:model', [
@@ -41,6 +50,11 @@ class ResourceCommand extends BaseCommand {
             '--has-one' => $this->option('has-one'),
             '--belongs-to' => $this->option('belongs-to'),
             '--belongs-to-many' => $this->option('belongs-to-many'),
+            '--has-many-through' => $this->option('has-many-through'),
+            '--morph-to' => $this->option('morph-to'),
+            '--morph-many' => $this->option('morph-many'),
+            '--morph-to-many' => $this->option('morph-to-many'),
+            '--morphed-by-many' => $this->option('morphed-by-many'),
             '--rules' => $this->rules(),
             '--path' => $this->option('path'),
             '--force' => $this->option('force'),
@@ -60,24 +74,34 @@ class ResourceCommand extends BaseCommand {
             '--parsed' => true
         ]);
 
-        // generating REST actions trait if doesn't exist
-        if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
-            $this->call('wn:controller:rest-actions');
+        if (! $this->option('no-controller')) {
+            // generating REST actions trait if doesn't exist
+            if(! $this->fs->exists('./app/Http/Controllers/RESTActions.php')){
+                $this->call('wn:controller:rest-actions');
+            }
+
+            // generating the controller and routes
+            $controllerOptions = [
+                'model' => $modelName,
+                '--force' => $this->option('force'),
+                '--no-routes' => $this->option('no-routes'),
+            ];
+            if ($this->option('laravel')) {
+                $controllerOptions['--laravel'] = true;
+            }
+            if ($this->option('routes')) {
+                $controllerOptions['--routes'] = $this->option('routes');
+            }
+            if ($this->option('controller')) {
+                $controllerOptions['--path'] = $this->option('controller');
+            }
+            $this->call('wn:controller', $controllerOptions);
         }
-        // generating the controller and routes
-        $controllerOptions = [
-            'model' => $modelName,
-            '--force' => $this->option('force'),
-            '--no-routes' => false,
-        ];
-        if ($this->option('laravel')) {
-            $controllerOptions['--laravel'] = true;
-        }
-        $this->call('wn:controller', $controllerOptions);
 
         // generating model factory
         $this->call('wn:factory', [
-            'model' => 'App\\' . $modelName,
+            'model' => $this->getNamespace().'\\'.$modelName,
+            '--file' => './database/factories/'.str_plural($modelName).'.php',
             '--fields' => $this->factoryFields(),
             '--force' => $this->option('force'),
             '--parsed' => true
@@ -103,16 +127,42 @@ class ResourceCommand extends BaseCommand {
                     ->parse($fields);
             }
             $this->fields = array_merge($this->fields, array_map(function($name) {
-                return [
-                    'name' => $name,
-                    'schema' => [
+                $return = [
+                    'name' => $name['name'],
+                    'schema' => [],
+                    'rules' => '',
+                    'tags' => ['fillable', 'key'],
+                    'factory' => ''
+                ];
+
+                if ($name['type'] == 'morphTo') {
+                    if (substr($name['name'], -3) == "_id") {
+                        $return['schema'] = [
+                            ['name' => 'integer', 'args' => []],
+                            ['name' => 'unsigned', 'args' => []]
+                        ];
+                        $return['rules'] = 'numeric';
+                        $return['factory'] = 'key';
+                    } else {
+                        $return['schema'] = [
+                            ['name' => 'string', 'args' => ['50']]
+                        ];
+                    }
+                    if ($name['nullable']) {
+                        $return['schema'][] = ['name' => 'nullable', 'args' => []];
+                    } else {
+                        $return['rules'] = 'required'.(!empty($return['rules'])?'|'.$return['rules']:'');
+                    }
+                } else {
+                    $return['schema'] = [
                         ['name' => 'integer', 'args' => []],
                         ['name' => 'unsigned', 'args' => []]
-                    ],
-                    'rules' => 'required|numeric',
-                    'tags' => ['fillable', 'key'],
-                    'factory' => 'key'
-                ];
+                    ];
+                    $return['rules'] = 'required|numeric';
+                    $return['factory'] = 'key';
+                }
+
+                return $return;
             }, $this->foreignKeys()));
         }
 
@@ -149,33 +199,48 @@ class ResourceCommand extends BaseCommand {
         }, $this->fields);
     }
 
-    protected function foreignKeys()
+    protected function foreignKeys($withMorph = true)
     {
         $belongsTo = $this->option('belongs-to');
-        if(! $belongsTo) {
+        $morphTo = $this->option('morph-to');
+
+        if(! $belongsTo && (! $withMorph || ! $morphTo)) {
             return [];
         }
-        $relations = $this->getArgumentParser('relations')->parse($belongsTo);
-        return array_map(function($relation){
-            $name = $relation['model'] ? $relation['model'] : $relation['name'];
-            $index = strrpos($name, "\\");
-            if($index) {
-                $name = substr($name, $index + 1);
-            }
-            return snake_case(str_singular($name)) . '_id';
-        }, $relations);
+
+        $belongsTo = $belongsTo ? $this->getArgumentParser('relations')->parse($belongsTo) : [];
+
+        $belongsTo = array_map(function($relation){
+            return array("model" => camel_case(str_singular($this->extractClassName($relation['model'] ? $relation['model'] : $relation['name']))), "name" => snake_case(str_singular($this->extractClassName($relation['name']))) . '_id', "type" => "belongsTo");
+        }, $belongsTo);
+
+        if ($withMorph) {
+            $morphTo = $morphTo ? $this->getArgumentParser('relations-morphTo')->parse($morphTo) : [];
+            $morphTo = array_map(function($relation){
+                $name = snake_case(str_singular($relation['name']));
+                return array(array("name" => $name . '_id', "type" => "morphTo", "nullable" => $relation['nullable']), array("name" => $name . '_type', "type" => "morphTo", "nullable" => $relation['nullable']));
+            }, $morphTo);
+
+            // $morphed = [];
+            // array_walk_recursive($morphTo, function($a) use (&$morphed) { $morphed[] = $a; });
+            $morphed = !empty($morphTo) ? call_user_func_array('array_merge', $morphTo) : array();
+
+            return array_merge($belongsTo, $morphed);
+        }
+
+        return $belongsTo;
     }
 
     protected function migrationKeys() {
         return array_map(function($name) {
             return [
-                'name' => $name,
+                'name' => snake_case($name['name']),
                 'column' => '',
-                'table' => '',
+                'table' => snake_case(str_plural($name['model'])),
                 'on_delete' => '',
                 'on_update' => ''
             ];
-        }, $this->foreignKeys());
+        }, $this->foreignKeys(false));
     }
 
     protected function factoryFields()

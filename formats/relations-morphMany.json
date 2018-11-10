@@ -1,0 +1,19 @@
+{
+	"type": "array",
+	"fields": {
+        "type": "object",
+        "separator": ":",
+        "fields": [
+            "name",
+            {
+                "name": "model",
+                "type": "string"
+            },
+            {
+                "name": "through",
+                "type": "string",
+                "default": ""
+            }
+        ]
+    }
+}

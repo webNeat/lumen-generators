@@ -19,9 +19,9 @@ class FactoryCommand extends BaseCommand {
 
         $file = $this->getFile();
 
-        $content = $this->fs->get($file);
+        $content = ! $this->fs->exists($file) ? '' : $this->fs->get($file);
 
-        $content .= $this->getTemplate('factory')
+        $content .= $this->getTemplate(! $this->fs->exists($file) ? 'factory-create' : 'factory')
             ->with([
                 'model' => $model,
                 'factory_fields' => $this->getFieldsContent()

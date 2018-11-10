@@ -32,7 +32,8 @@
         	{
         		"name": "factory",
         		"type": "string",
-        		"default": false
+        		"default": false,
+				"required": false
         	}
         ]
     }

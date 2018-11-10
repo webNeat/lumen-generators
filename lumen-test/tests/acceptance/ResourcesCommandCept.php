@@ -45,25 +45,25 @@ $I->deleteFile('./app/Http/Controllers/BooksController.php');
 // Checking routes
 $I->openFile('./app/Http/routes.php');
 $I->seeInThisFile('
-$app->get(\'author\', \'AuthorsController@all\');
-$app->get(\'author/{id}\', \'AuthorsController@get\');
-$app->post(\'author\', \'AuthorsController@add\');
-$app->put(\'author/{id}\', \'AuthorsController@put\');
-$app->delete(\'author/{id}\', \'AuthorsController@remove\');');
+$router->get(\'author\', \'AuthorsController@all\');
+$router->get(\'author/{id}\', \'AuthorsController@get\');
+$router->post(\'author\', \'AuthorsController@add\');
+$router->put(\'author/{id}\', \'AuthorsController@put\');
+$router->delete(\'author/{id}\', \'AuthorsController@remove\');');
 
 $I->seeInThisFile('
-$app->get(\'book\', \'BooksController@all\');
-$app->get(\'book/{id}\', \'BooksController@get\');
-$app->post(\'book\', \'BooksController@add\');
-$app->put(\'book/{id}\', \'BooksController@put\');
-$app->delete(\'book/{id}\', \'BooksController@remove\');');
+$router->get(\'book\', \'BooksController@all\');
+$router->get(\'book/{id}\', \'BooksController@get\');
+$router->post(\'book\', \'BooksController@add\');
+$router->put(\'book/{id}\', \'BooksController@put\');
+$router->delete(\'book/{id}\', \'BooksController@remove\');');
 
 $I->seeInThisFile('
-$app->get(\'library\', \'LibrariesController@all\');
-$app->get(\'library/{id}\', \'LibrariesController@get\');
-$app->post(\'library\', \'LibrariesController@add\');
-$app->put(\'library/{id}\', \'LibrariesController@put\');
-$app->delete(\'library/{id}\', \'LibrariesController@remove\');');
+$router->get(\'library\', \'LibrariesController@all\');
+$router->get(\'library/{id}\', \'LibrariesController@get\');
+$router->post(\'library\', \'LibrariesController@add\');
+$router->put(\'library/{id}\', \'LibrariesController@put\');
+$router->delete(\'library/{id}\', \'LibrariesController@remove\');');
 $I->writeToFile('./app/Http/routes.php', '<?php
 
 /*
@@ -77,8 +77,8 @@ $I->writeToFile('./app/Http/routes.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->welcome();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
 

@@ -39,7 +39,7 @@ class BaseCommand extends Command {
         }
         $this->makeDirectory($path);
         $this->fs->put($path, $content);
-        $this->info("{$name} generated !");
+        $this->info("{$name} generated in {$path}!");
     }
 
     protected function makeDirectory($path)
@@ -49,9 +49,48 @@ class BaseCommand extends Command {
         }
     }
 
-    protected function spaces($n)
+    protected function spaces($n): string
     {
         return str_repeat(' ', $n);
+    }
+
+    protected function getNamespace(string $path = null): string
+    {
+		if (empty($path)) {
+			$path = $this->option('path');
+		}
+
+    	return implode('\\', array_map('studly_case', array_filter(array_map('trim', explode('/', $path)), function($value) {
+            return !empty($value);
+        })));
+    }
+
+    protected function parseValue($value, string $parser)
+    {
+        if(! $value){
+            return false;
+        }
+
+        if(! $this->option('parsed')){
+            return $this->getArgumentParser($parser)->parse($value);
+        }
+
+        return $value;
+    }
+
+    protected function prependNamespace(string $value, string $path = null): string
+    {
+        if (strpos($value, '\\') === false) {
+            return $this->getNamespace($path) . '\\' . studly_case(str_singular($value));
+        }
+
+        return $value;
+    }
+
+    protected function extractClassName(string $fqClassName): string
+    {
+        $names = array_reverse(explode("\\", $fqClassName));
+        return $names[0];
     }
 
 }

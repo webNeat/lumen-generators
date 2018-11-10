@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+cd "$(dirname "$0")"
+
 # models
 rm app/*.php 2> /dev/null
 
@@ -11,13 +15,15 @@ echo "<?php
     return \$app->welcome();
 });" > app/Http/routes.php
 
-echo "<?php
-/*
-|------------------------------------------
-|   ***** DUMMY ROUTES FOR TESTING ONLY *****
-|------------------------------------------
-*/
-" > routes/api.php
+if [ -d "routes" ]; then
+    echo "<?php
+    /*
+    |------------------------------------------
+    |   ***** DUMMY ROUTES FOR TESTING ONLY *****
+    |------------------------------------------
+    */
+    " > routes/api.php
+fi
 
 # Controllers
 rm app/Http/Controllers/*.php 2> /dev/null

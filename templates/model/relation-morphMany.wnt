@@ -1,0 +1,4 @@
+    public function {{name}}()
+    {
+        return $this->{{type}}("{{model}}", "{{through}}");
+    }

@@ -23,23 +23,23 @@ class MigrationCommand extends BaseCommand {
         $name = 'Create' . ucwords(camel_case($table));
         $snakeName = snake_case($name);
 
+        $file = $this->option('file');
+        if (! $file) {
+            $file = date('Y_m_d_His_') . $snakeName . '_table';
+            $this->deleteOldMigration($snakeName);
+        } else {
+            $this->deleteOldMigration($file);
+        }
+
         $content = $this->getTemplate('migration')
             ->with([
                 'table' => $table,
                 'name' => $name,
-                'schema' => $this->getSchema(),
-                'additionals' => $this->getAdditionals(),
-                'constraints' => $this->getConstraints()
+                'schema' => $this->getSchema($this->option('schema')),
+                'additionals' => $this->getAdditionals($this->option('add')),
+                'constraints' => $this->getConstraints($this->option('keys'))
             ])
             ->get();
-
-        $file = $this->option('file');
-        if(! $file){
-            $file = date('Y_m_d_His_') . $snakeName . '_table';
-            $this->deleteOldMigration($snakeName);
-        }else{
-            $this->deleteOldMigration($file);
-        }
 
         $this->save($content, "./database/migrations/{$file}.php", "{$table} migration");
     }
@@ -55,29 +55,13 @@ class MigrationCommand extends BaseCommand {
         }
     }
 
-    protected function getSchema()
+    protected function getSchema($schema)
     {
-        $schema = $this->option('schema');
-        if(! $schema){
-            return $this->spaces(12) . "// Schema declaration";
-        }
-
-        $items = $schema;
-        if( ! $this->option('parsed')){
-            $items = $this->getArgumentParser('schema')->parse($schema);
-        }
-
-        $fields = [];
-        foreach ($items as $item) {
-            $fields[] = $this->getFieldDeclaration($item);
-        }
-
-        return implode(PHP_EOL, $fields);
+        return $this->buildParameters($this->parseValue($schema, 'schema'), "// Schema declaration", [$this, 'getFieldDeclaration']);
     }
 
-    protected function getAdditionals()
+    protected function getAdditionals($additionals)
     {
-        $additionals = $this->option('add');
         if (empty($additionals)) {
             return '';
         }
@@ -103,24 +87,26 @@ class MigrationCommand extends BaseCommand {
         return "            \$table" . implode('', $parts) . ';';
     }
 
-    protected function getConstraints()
+    protected function getConstraints($keys)
     {
-        $keys = $this->option('keys');
-        if(! $keys){
-            return $this->spaces(12) . "// Constraints declaration";
+        return $this->buildParameters($this->parseValue($keys, 'foreign-keys'), "// Constraints declaration", [$this, 'getConstraintDeclaration']);
+    }
+
+    protected function buildParameters($items, $emptyPlaceholder, $callback = null) {
+        if ($items === false) {
+            return $this->spaces(12) . $emptyPlaceholder;
         }
 
-        $items = $keys;
-        if(! $this->option('parsed')){
-            $items = $this->getArgumentParser('foreign-keys')->parse($keys);
-        }
-
-        $constraints = [];
+        $parameters = [];
         foreach ($items as $item) {
-            $constraints[] = $this->getConstraintDeclaration($item);
+            if (!empty($callback) && is_callable($callback)) {
+                $parameters[] = call_user_func($callback, $item);
+            } else {
+                $parameters[] = $item;
+            }
         }
 
-        return implode(PHP_EOL, $constraints);
+        return implode(PHP_EOL, $parameters);
     }
 
     protected function getConstraintDeclaration($key)
@@ -129,13 +115,13 @@ class MigrationCommand extends BaseCommand {
             $key['column'] = 'id';
         }
         if(! $key['table']){
-            $key['table'] = str_plural(substr($key['name'], 0, count($key['name']) - 4));
+            $key['table'] = substr($key['name'], 0, count($key['name']) - 4);
         }
 
         $constraint = $this->getTemplate('migration/foreign-key')
             ->with([
                 'name' => $key['name'],
-                'table' => $key['table'],
+                'table' => snake_case(str_plural($key['table'])),
                 'column' => $key['column']
             ])
             ->get();

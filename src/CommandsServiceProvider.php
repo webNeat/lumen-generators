@@ -15,6 +15,7 @@ class CommandsServiceProvider extends ServiceProvider
         $this->registerResourceCommand();
         $this->registerResourcesCommand();
         $this->registerPivotTableCommand();
+        $this->registerMorphTableCommand();
         $this->registerFactoryCommand();
         // registerSeederCommand
         // registerPivotSeederCommand
@@ -82,6 +83,13 @@ class CommandsServiceProvider extends ServiceProvider
             return $app['Wn\Generators\Commands\PivotTableCommand'];
         });
         $this->commands('command.wn.pivot-table');
+    }
+
+    protected function registerMorphTableCommand(){
+        $this->app->singleton('command.wn.morph-table', function($app){
+            return $app['Wn\Generators\Commands\MorphTableCommand'];
+        });
+        $this->commands('command.wn.morph-table');
     }
 
     protected function registerFactoryCommand(){

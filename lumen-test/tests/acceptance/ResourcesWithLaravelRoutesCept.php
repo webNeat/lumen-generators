@@ -108,6 +108,7 @@ $I->writeToFile('./database/factories/ModelFactory.php', "<?php
 ");
 
 $I->deleteFile('database/database.sqlite');
+$I->deleteDir('./routes');
 
 // Checking database seeder
 // $I->openFile('./database/seeds/TaskCategoriesTableSeeder.php');

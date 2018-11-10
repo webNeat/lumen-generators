@@ -10,7 +10,7 @@ $I->seeFileContentsEqual('<?php namespace App\Http\Controllers;
 
 class TestsController extends Controller {
 
-    const MODEL = "App\\Test";
+    const MODEL = \'App\\Test\';
 
     use RESTActions;
 
@@ -27,7 +27,7 @@ $I->seeFileContentsEqual('<?php namespace App\Http\Controllers;
 
 class CategoriesController extends Controller {
 
-    const MODEL = "App\\Models\\Category";
+    const MODEL = \'App\\Models\\Category\';
 
     use RESTActions;
 
@@ -36,11 +36,11 @@ class CategoriesController extends Controller {
 $I->deleteFile('./app/Http/Controllers/CategoriesController.php');
 $I->openFile('./app/Http/routes.php');
 $I->seeInThisFile("
-\$app->get('category', 'CategoriesController@all');
-\$app->get('category/{id}', 'CategoriesController@get');
-\$app->post('category', 'CategoriesController@add');
-\$app->put('category/{id}', 'CategoriesController@put');
-\$app->delete('category/{id}', 'CategoriesController@remove');
+\$router->get('category', 'CategoriesController@all');
+\$router->get('category/{id}', 'CategoriesController@get');
+\$router->post('category', 'CategoriesController@add');
+\$router->put('category/{id}', 'CategoriesController@put');
+\$router->delete('category/{id}', 'CategoriesController@remove');
 ");
 $I->writeToFile('./app/Http/routes.php', '<?php
 
@@ -55,7 +55,7 @@ $I->writeToFile('./app/Http/routes.php', '<?php
 |
 */
 
-$app->get("/", function () use ($app) {
-    return $app->welcome();
+$router->get("/", function () use ($router) {
+    return \'Hello World\';
 });
 ');
