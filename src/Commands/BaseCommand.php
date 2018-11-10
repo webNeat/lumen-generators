@@ -56,7 +56,7 @@ class BaseCommand extends Command {
 
     protected function getNamespace(string $path = null): string
     {
-		if (! $path) {
+		if (empty($path)) {
 			$path = $this->option('path');
 		}
 

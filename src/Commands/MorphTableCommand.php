@@ -3,7 +3,7 @@
 
 class MorphTableCommand extends BaseCommand {
 
-	protected $signature = 'wn:morph-table
+    protected $signature = 'wn:morph-table
         {model : Name of the persistant model or table}
         {morphable : Name of the morphable identifier}
         {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
@@ -11,7 +11,7 @@ class MorphTableCommand extends BaseCommand {
         {--force= : override the existing files}
     ';
 
-	protected $description = 'Generates creation migration for a morphable pivot table';
+    protected $description = 'Generates creation migration for a morphable pivot table';
 
     protected $fields;
 
@@ -33,14 +33,14 @@ class MorphTableCommand extends BaseCommand {
     protected function parseFields()
     {
         $this->fields = array_map(function($arg, $app) {
-            return snake_case(str_singular($this->argument($arg)))."_".$app;
+            return snake_case(str_singular($this->argument($arg))) . "_" . $app;
         }, ['model', 'morphable', 'morphable'], ['id', 'id', 'type']);
 
     }
 
     protected function schema()
     {
-        return implode(' ', array_map(function($field){
+        return implode(' ', array_map(function($field) {
             return $field . ':' . (substr($field, -3) == '_id' ? 'integer:unsigned' : 'string.50') . ':index';
         }, $this->fields));
     }
@@ -48,7 +48,7 @@ class MorphTableCommand extends BaseCommand {
     protected function keys()
     {
         // return implode(' ', $this->fields);
-		return snake_case(str_singular($this->argument('model')))."_id";
+        return snake_case(str_singular($this->argument('model'))) . "_id";
     }
 
 }

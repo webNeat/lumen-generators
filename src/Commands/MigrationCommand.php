@@ -35,9 +35,9 @@ class MigrationCommand extends BaseCommand {
             ->with([
                 'table' => $table,
                 'name' => $name,
-                'schema' => $this->getSchema(),
-                'additionals' => $this->getAdditionals(),
-                'constraints' => $this->getConstraints()
+                'schema' => $this->getSchema($this->option('schema')),
+                'additionals' => $this->getAdditionals($this->option('add')),
+                'constraints' => $this->getConstraints($this->option('keys'))
             ])
             ->get();
 
@@ -55,24 +55,13 @@ class MigrationCommand extends BaseCommand {
         }
     }
 
-    protected function getSchema()
+    protected function getSchema($schema)
     {
-        $items = $this->parseValue($this->option('schema'), 'schema');
-        if ($items === false) {
-            return $this->spaces(12) . "// Schema declaration";
-        }
-
-        $fields = [];
-        foreach ($items as $item) {
-            $fields[] = $this->getFieldDeclaration($item);
-        }
-
-        return implode(PHP_EOL, $fields);
+        return $this->buildParameters($this->parseValue($schema, 'schema'), "// Schema declaration", [$this, 'getFieldDeclaration']);
     }
 
-    protected function getAdditionals()
+    protected function getAdditionals($additionals)
     {
-        $additionals = $this->option('add');
         if (empty($additionals)) {
             return '';
         }
@@ -98,19 +87,26 @@ class MigrationCommand extends BaseCommand {
         return "            \$table" . implode('', $parts) . ';';
     }
 
-    protected function getConstraints()
+    protected function getConstraints($keys)
     {
-        $items = $this->parseValue($this->option('keys'), 'foreign-keys');
+        return $this->buildParameters($this->parseValue($keys, 'foreign-keys'), "// Constraints declaration", [$this, 'getConstraintDeclaration']);
+    }
+
+    protected function buildParameters($items, $emptyPlaceholder, $callback = null) {
         if ($items === false) {
-            return $this->spaces(12) . "// Constraints declaration";
+            return $this->spaces(12) . $emptyPlaceholder;
         }
 
-        $constraints = [];
+        $parameters = [];
         foreach ($items as $item) {
-            $constraints[] = $this->getConstraintDeclaration($item);
+            if (!empty($callback) && is_callable($callback)) {
+                $parameters[] = call_user_func($callback, $item);
+            } else {
+                $parameters[] = $item;
+            }
         }
 
-        return implode(PHP_EOL, $constraints);
+        return implode(PHP_EOL, $parameters);
     }
 
     protected function getConstraintDeclaration($key)

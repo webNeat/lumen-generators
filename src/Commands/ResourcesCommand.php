@@ -278,15 +278,19 @@ class ResourcesCommand extends BaseCommand {
         return $parsedRelations;
     }
 
+    protected function getConditionalTableName($condition, $then, $else)
+    {
+        if($condition){
+            return snake_case($this->extractClassName($then));
+        } else {
+            return snake_case($this->extractClassName($else));
+        }
+    }
+
     protected function belongsTo($name, $modelName, $belongsTo)
     {
         return $this->parseRelations('relations', $belongsTo, function($relation) use ($name, $modelName) {
-            if(! $relation['model']){
-                $table = snake_case($relation['name']);
-            } else {
-                $table = snake_case($this->extractClassName($relation['model']));
-            }
-
+            $table = $this->getConditionalTableName(! $relation['model'], $relation['name'], $relation['model']);
             $tables = [ str_singular($table), $name ];
             sort($tables);
             $tables[] = $modelName;
@@ -297,12 +301,7 @@ class ResourcesCommand extends BaseCommand {
     protected function morphToMany($modelName, $morphToMany)
     {
         return $this->parseRelations('relations-morphMany', $morphToMany, function($relation) use ($modelName) {
-            if(! $relation['through']){
-                $name = snake_case($relation['name']);
-            } else {
-                $name = snake_case($this->extractClassName($relation['model']));
-            }
-
+            $name = $this->getConditionalTableName(! $relation['through'], $relation['name'], $relation['model']);
             return $this->getMorphableRelation($relation, $name, $modelName);
         });
     }
@@ -315,12 +314,7 @@ class ResourcesCommand extends BaseCommand {
     }
 
     protected function getMorphableRelation($relation, $relationName, $modelName) {
-        if(! $relation['through']){
-            $morphable = snake_case($this->extractClassName($relation['model']));
-        } else {
-            $morphable = snake_case($this->extractClassName($relation['through']));
-        }
-
+        $morphable = $this->getConditionalTableName(! $relation['through'], $relation['model'], $relation['through']);
         return [ str_singular($relationName), str_singular($morphable), $modelName ];
     }
 

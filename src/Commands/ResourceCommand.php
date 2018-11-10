@@ -199,14 +199,6 @@ class ResourceCommand extends BaseCommand {
         }, $this->fields);
     }
 
-    protected function getBaseModel($path) {
-        $index = strrpos($path, "\\");
-        if($index) {
-            return substr($path, $index + 1);
-        }
-        return $path;
-    }
-
     protected function foreignKeys($withMorph = true)
     {
         $belongsTo = $this->option('belongs-to');
@@ -219,7 +211,7 @@ class ResourceCommand extends BaseCommand {
         $belongsTo = $belongsTo ? $this->getArgumentParser('relations')->parse($belongsTo) : [];
 
         $belongsTo = array_map(function($relation){
-            return array("model" => camel_case(str_singular($this->getBaseModel($relation['model'] ? $relation['model'] : $relation['name']))), "name" => snake_case(str_singular($this->getBaseModel($relation['name']))) . '_id', "type" => "belongsTo");
+            return array("model" => camel_case(str_singular($this->extractClassName($relation['model'] ? $relation['model'] : $relation['name']))), "name" => snake_case(str_singular($this->extractClassName($relation['name']))) . '_id', "type" => "belongsTo");
         }, $belongsTo);
 
         if ($withMorph) {
