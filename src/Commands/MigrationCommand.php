@@ -24,9 +24,11 @@ class MigrationCommand extends BaseCommand {
         $snakeName = snake_case($name);
 
         $file = $this->option('file');
-        if(! $file){
-            $name = "Migration".sprintf('%06d', self::$COUNTER++) . $name;
-            $file = date('Y_m_d_His_') . snake_case($name) . '_table';
+        if (! $file) {
+            $file = date('Y_m_d_His_') . $snakeName . '_table';
+            $this->deleteOldMigration($snakeName);
+        } else {
+            $this->deleteOldMigration($file);
         }
 
         $content = $this->getTemplate('migration')
@@ -38,14 +40,6 @@ class MigrationCommand extends BaseCommand {
                 'constraints' => $this->getConstraints()
             ])
             ->get();
-
-        $file = $this->option('file');
-        if(! $file){
-            $file = date('Y_m_d_His_') . $snakeName . '_table';
-            $this->deleteOldMigration($snakeName);
-        }else{
-            $this->deleteOldMigration($file);
-        }
 
         $this->save($content, "./database/migrations/{$file}.php", "{$table} migration");
     }
@@ -63,14 +57,9 @@ class MigrationCommand extends BaseCommand {
 
     protected function getSchema()
     {
-        $schema = $this->option('schema');
-        if(! $schema){
+        $items = $this->parseValue($this->option('schema'), 'schema');
+        if ($items === false) {
             return $this->spaces(12) . "// Schema declaration";
-        }
-
-        $items = $schema;
-        if( ! $this->option('parsed')){
-            $items = $this->getArgumentParser('schema')->parse($schema);
         }
 
         $fields = [];
@@ -111,14 +100,9 @@ class MigrationCommand extends BaseCommand {
 
     protected function getConstraints()
     {
-        $keys = $this->option('keys');
-        if(! $keys){
+        $items = $this->parseValue($this->option('keys'), 'foreign-keys');
+        if ($items === false) {
             return $this->spaces(12) . "// Constraints declaration";
-        }
-
-        $items = $keys;
-        if(! $this->option('parsed')){
-            $items = $this->getArgumentParser('foreign-keys')->parse($keys);
         }
 
         $constraints = [];

@@ -94,31 +94,16 @@ class ModelCommand extends BaseCommand {
             foreach ($items as $item) {
                 $item['type'] = $type;
 				if ($parser == 'relations') {
-					if(! $item['model']){
-	                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
-	                } else if(strpos($item['model'], '\\') === false ){
-	                    $item['model'] = $this->getNamespace() . '\\' . $item['model'];
-	                }
+					$item['model'] = $this->prependNamespace($item['model'] ?: $item['name']);
 				} else if ($parser != 'relations') {
 					switch($type) {
 						case "hasManyThrough":
 							if(! $item['through'] && $item['model']){
-								$item['through'] = $item['model'];
-								$item['model'] = $item['name'];
-
-								if(strpos($item['through'], '\\') === false ){
-									$item['through'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['through']));
-								}
-								if(strpos($item['model'], '\\') === false ){
-									$item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['model']));
-								}
+								$item['through'] = $this->prependNamespace($item['model']);
+								$item['model'] = $this->prependNamespace($item['name']);
 							} else {
-								if(strpos($item['through'], '\\') === false ){
-									$item['through'] = $this->getNamespace() . '\\' . $item['through'];
-								}
-								if(strpos($item['model'], '\\') === false ){
-									$item['model'] = $this->getNamespace() . '\\' . $item['model'];
-								}
+								$item['through'] = $this->prependNamespace($item['through']);
+								$item['model'] = $this->prependNamespace($item['model']);
 							}
 							break;
 						case "morphMany":
@@ -126,10 +111,9 @@ class ModelCommand extends BaseCommand {
 						case "morphedByMany":
 							if(! $item['through']){
 								$item['through'] = $item['model'];
-								$item['model'] = ucwords(str_singular($item['name']));
-							}
-							if(strpos($item['model'], '\\') === false ){
-								$item['model'] = $this->getNamespace() . '\\' . $item['model'];
+								$item['model'] = $this->prependNamespace($item['name']);
+							} else {
+								$item['model'] = $this->prependNamespace($item['model']);
 							}
 							break;
 
@@ -143,16 +127,13 @@ class ModelCommand extends BaseCommand {
 
     protected function getRules()
     {
-        $rules = $this->option('rules');
-        if(! $rules){
-            return "        // Validation rules";
-        }
-        $items = $rules;
-        if(! $this->option('parsed')){
-            $items = $this->getArgumentParser('rules')->parse($rules);
-        }
-        $rules = [];
+        $items = $this->parseValue($this->option('rules'), 'rules');
+		if ($items === false) {
+			return $this->spaces(8) . "// Validation rules";
+		}
+
         $template = $this->getTemplate('model/rule');
+        $rules = [];
         foreach ($items as $item) {
             $rules[] = $template->with($item)->get();
         }
@@ -162,7 +143,7 @@ class ModelCommand extends BaseCommand {
 
     protected function getAdditional()
     {
-        return $this->option('timestamps') == 'false'
+        return $this->option('timestamps') === 'false'
             ? "    public \$timestamps = false;" . PHP_EOL . PHP_EOL
             : '';
     }

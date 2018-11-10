@@ -60,7 +60,36 @@ class BaseCommand extends Command {
 			$path = $this->option('path');
 		}
 
-    	return str_replace(' ', '\\', ucwords(trim(str_replace('/', ' ', $path))));
+    	return implode('\\', array_map('studly_case', array_filter(array_map('trim', explode('/', $path)), function($value) {
+            return !empty($value);
+        })));
+    }
+
+    protected function parseValue($value, $parser)
+    {
+        if(! $value){
+            return false;
+        }
+
+        if(! $this->option('parsed')){
+            return $this->getArgumentParser($parser)->parse($value);
+        }
+
+        return $value;
+    }
+
+    protected function prependNamespace($value, $path = false)
+    {
+        if (strpos($value, '\\') === false) {
+            return $this->getNamespace($path) . '\\' . studly_case(str_singular($value));
+        }
+
+        return $value;
+    }
+
+    protected function extractClassName($fqClassName) {
+        $names = array_reverse(explode("\\", $fqClassName));
+        return $names[0];
     }
 
 }

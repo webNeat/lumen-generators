@@ -26,7 +26,6 @@ class ResourcesCommand extends BaseCommand {
     protected $pivotTables = [];
     protected $morphTables = [];
 
-    private $nodes = [];
     private $checkedErrors = 0;
     private $checkErrors = [];
     private $checkInfo = [];
@@ -34,50 +33,27 @@ class ResourcesCommand extends BaseCommand {
     public function handle()
     {
         $files = $this->argument('files');
-        $this->nodes = [];
+        $nodes = [];
         foreach ($files as $file) {
-        	$this->info("Reading file ".$file);
-
-        	$content = $this->fs->get($file);
-        	$content = Yaml::parse($content);
-
-        	foreach ($content as $model => $i){
-        		/*
-        			$i['modelname'] = as originally in YAML defined
-        			$i['name']      = as originally defined in snake_case
-        			$i['uniquename']= for key in singular studly_case
-        		*/
-        		$i['filename'] = $file;
-        		$i['modelname'] = $model;
-        		$model = studly_case(str_singular($model));
-        		$i['uniquename'] = $model;
-
-        		if (empty($this->nodes[$model]) || $this->option('force-redefine')) {
-        			if (!empty($this->nodes[$model])) {
-        				$this->checkError($model . ": forced to redefine (in file " . $this->nodes[$model]['filename'] . ", redefined from file ".$file.")");
-        			}
-        			$i = $this->getResourceParams($i);
-        			$this->nodes[$model] = $i;
-        		} else {
-        			$this->checkError($model . ": already defined (in file " . $this->nodes[$model]['filename'] . ", trying to redefine from file ".$file."; Use --force-redefine to force redefinition)");
-        		}
-        	}
+            $nodes = $this->mergeNodes($nodes, $this->readFile($file), $this->option('force-redefine'));
         }
 
         $this->line('');
         $this->info('Bringing models to order...');
 
-        $this->nodes = $this->sortDependencies();
+        $nodes = $this->sortDependencies($nodes);
+        $pivotTables = $this->uniqueArray($this->getTables($nodes, 'pivotTables'));
+        $morphTables = $this->uniqueArray($this->getTables($nodes, 'morphTables'));
 
         if (! $this->option('skip-check')) {
         	$this->info('Checking Relationships...');
-        	$keys = array_keys($this->nodes);
-        	foreach ($this->nodes as $model => $i) {
+        	$keys = array_keys($nodes);
+        	foreach ($nodes as $model => $i) {
         		$this->checkRelations($i['belongsTo'], 'belongsTo', $i['filename'], $i['uniquename'], $keys);
         		// $this->checkRelations($i['hasManyThrough'], 'hasManyThrough', $file, $model);
         	}
-        	$this->checkPivotRelations($this->pivotTables, 'pivot');
-        	$this->checkPivotRelations($this->morphTables, 'morph');
+        	$this->checkPivotRelations($nodes, $pivotTables, 'pivot');
+        	$this->checkPivotRelations($nodes, $morphTables, 'morph');
         }
 
         if ($this->checkedErrors > 0) {
@@ -94,99 +70,152 @@ class ResourcesCommand extends BaseCommand {
         	$proceed = $this->confirm("We have found " . $this->checkedErrors . " errors. Are you sure you want to continue?");
         }
         if ($proceed) {
-        	$modelIndex = 0;
-            $migrationIdLength = strlen((string)count($this->nodes));
-        	foreach ($this->nodes as $i) {
-        		$migrationName = 'Create' .  ucwords(str_plural($i['name']));
-        		$migrationFile = date('Y_m_d_His') . '-' . str_pad($modelIndex , $migrationIdLength, 0, STR_PAD_LEFT) . '_' . snake_case($migrationName) . '_table';
-
-        		$this->line('');
-        		$this->info('Building Model ' . $i['uniquename']);
-
-        		$options = [
-        			'name' => $i['name'],
-        			'fields' => $i['fields'],
-        			'--add' => $i['add'],
-        			'--has-many' => $i['hasMany'],
-        			'--has-one' => $i['hasOne'],
-        			'--belongs-to' => $i['belongsTo'],
-        			'--belongs-to-many' => $i['belongsToMany'],
-        			'--has-many-through' => $i['hasManyThrough'],
-        			'--morph-to' => $i['morphTo'],
-        			'--morph-many' => $i['morphMany'],
-        			'--morph-to-many' => $i['morphToMany'],
-        			'--morphed-by-many' => $i['morphedByMany'],
-        			'--no-routes' => $this->option('no-routes'),
-        			'--no-controller' => $this->option('no-controllers'),
-        			'--force' => $this->option('force'),
-        			'--migration-file' => $migrationFile,
-        		];
-        		if ($this->option('laravel')) {
-        			$options['--laravel'] = true;
-        		}
-        		if ($this->option('routes')) {
-        			$options['--routes'] = $this->option('routes');
-        		}
-        		if ($this->option('controllers')) {
-        			$options['--controller'] = $this->option('controllers');
-        		}
-        		if ($this->option('path')) {
-        			$options['--path'] = $this->option('path');
-        		}
-
-        		$this->call('wn:resource', $options);
-        		$modelIndex++;
-        	}
+        	$this->buildResources($nodes);
 
         	// if (!$this->option('no-migration')) {
         	// 	$this->call('migrate'); // actually needed for pivot seeders !
         	// }
 
-        	$this->pivotTables = array_map(
-        		'unserialize',
-        		array_unique(array_map('serialize', $this->pivotTables))
-        	);
+        	$this->line('');
+            $this->buildTables('Pivot-Table', 'wn:pivot-table', 'model1', 'model2', $pivotTables);
 
         	$this->line('');
-        	foreach ($this->pivotTables as $tables) {
-        		$this->info('Building Pivot-Table ' . $tables[0] . ' - ' . $tables[1]);
-        		$this->call('wn:pivot-table', [
-        			'model1' => $tables[0],
-        			'model2' => $tables[1],
-        			'--force' => $this->option('force')
-        		]);
-
-        		// $this->call('wn:pivot-seeder', [
-        		//     'model1' => $tables[0],
-        		//     'model2' => $tables[1],
-        		//     '--force' => $this->option('force')
-        		// ]);
-        	}
-
-        	$this->morphTables = array_map(
-        		'unserialize',
-        		array_unique(array_map('serialize', $this->morphTables))
-        	);
-
-        	$this->line('');
-        	foreach ($this->morphTables as $tables) {
-        		$this->info('Building Morph-Table ' . $tables[0] . ' - ' . $tables[1]);
-        		$this->call('wn:morph-table', [
-        			'model' => $tables[0],
-        			'morphable' => $tables[1],
-        			'--force' => $this->option('force')
-        		]);
-
-        		// $this->call('wn:pivot-seeder', [
-        		//     'model1' => $tables[0],
-        		//     'model2' => $tables[1],
-        		//     '--force' => $this->option('force')
-        		// ]);
-        	}
+            $this->buildTables('Morph-Table', 'wn:morph-table', 'model', 'morphable', $morphTables);
 
         	if (!$this->option('no-migration')) {
         		$this->call('migrate');
         	}
+        }
+    }
+
+    protected function uniqueArray($array)
+    {
+        return array_map(
+            'unserialize',
+            array_unique(array_map('serialize', $array))
+        );
+    }
+
+    protected function readFile($file)
+    {
+        $this->info("Reading file ".$file);
+
+        $content = $this->fs->get($file);
+        $content = Yaml::parse($content);
+
+        $nodes = [];
+
+        foreach ($content as $model => $i){
+            /*
+                $i['modelname'] = as originally in YAML defined
+                $i['name']      = as originally defined in snake_case
+                $i['uniquename']= for key in singular studly_case
+            */
+            $i['filename'] = $file;
+            $i['modelname'] = $model;
+            $model = studly_case(str_singular($model));
+            $i['uniquename'] = $model;
+
+            $nodes[] = $this->getResourceParams($i);
+        }
+
+        return $nodes;
+    }
+
+    protected function mergeNodes($nodes, $toMerge, $forceRedefinition = false) {
+        foreach($toMerge as $node) {
+            $nodes = $this->mergeNode($nodes, $node, $forceRedefinition);
+        }
+
+        return $nodes;
+    }
+
+    protected function mergeNode($nodes, $toMerge, $forceRedefinition = false) {
+        if (empty($nodes[$toMerge['uniquename']]) || $forceRedefinition) {
+            if (!empty($nodes[$toMerge['uniquename']])) {
+                $this->checkError($toMerge['uniquename'] . ": forced to redefine (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", redefined from file ".$file.")");
+            }
+            $nodes[$toMerge['uniquename']] = $toMerge;
+        } else {
+            $this->checkError($toMerge['uniquename'] . ": already defined (in file " . $nodes[$toMerge['uniquename']]['filename'] . ", trying to redefine from file ".$file."; Use --force-redefine to force redefinition)");
+        }
+
+        return $nodes;
+    }
+
+    protected function getTables($nodes, $key) {
+        $tables = [];
+        foreach($nodes as $node) {
+            if (!empty($node[$key])) {
+                $tables = array_merge($tables, $node[$key]);
+            }
+        }
+
+        return $tables;
+    }
+
+    protected function buildResources($nodes)
+    {
+        $modelIndex = 0;
+        $migrationIdLength = strlen((string)count($nodes));
+        foreach ($nodes as $i) {
+            $migrationName = 'Create' .  ucwords(str_plural($i['name']));
+            $migrationFile = date('Y_m_d_His') . '-' . str_pad($modelIndex , $migrationIdLength, 0, STR_PAD_LEFT) . '_' . snake_case($migrationName) . '_table';
+
+            $this->line('');
+            $this->info('Building Model ' . $i['uniquename']);
+
+            $options = [
+                'name' => $i['name'],
+                'fields' => $i['fields'],
+                '--add' => $i['add'],
+                '--has-many' => $i['hasMany'],
+                '--has-one' => $i['hasOne'],
+                '--belongs-to' => $i['belongsTo'],
+                '--belongs-to-many' => $i['belongsToMany'],
+                '--has-many-through' => $i['hasManyThrough'],
+                '--morph-to' => $i['morphTo'],
+                '--morph-many' => $i['morphMany'],
+                '--morph-to-many' => $i['morphToMany'],
+                '--morphed-by-many' => $i['morphedByMany'],
+                '--no-routes' => $this->option('no-routes'),
+                '--no-controller' => $this->option('no-controllers'),
+                '--force' => $this->option('force'),
+                '--migration-file' => $migrationFile,
+            ];
+            if ($this->option('laravel')) {
+                $options['--laravel'] = true;
+            }
+            if ($this->option('routes')) {
+                $options['--routes'] = $this->option('routes');
+            }
+            if ($this->option('controllers')) {
+                $options['--controller'] = $this->option('controllers');
+            }
+            if ($this->option('path')) {
+                $options['--path'] = $this->option('path');
+            }
+
+            $this->call('wn:resource', $options);
+            $modelIndex++;
+        }
+    }
+
+    protected function buildTables($type, $command, $model1, $model2, $tableAssignment)
+    {
+        foreach ($tableAssignment as $tables) {
+            $this->info('Building '.$type.' ' . $tables[0] . ' - ' . $tables[1]);
+            $this->call($command, [
+                $model1 => $tables[0],
+                $model2 => $tables[1],
+                '--force' => $this->option('force')
+            ]);
+
+            // $this->call('wn:pivot-seeder', [
+            //     'model1' => $tables[0],
+            //     'model2' => $tables[1],
+            //     '--force' => $this->option('force')
+            // ]);
         }
     }
 
@@ -208,61 +237,15 @@ class ResourcesCommand extends BaseCommand {
         }
 
         if($i['belongsToMany']){
-            $relations = $this->getArgumentParser('relations')->parse($i['belongsToMany']);
-            foreach ($relations as $relation){
-                $table = '';
-
-                if(! $relation['model']){
-                    $table = snake_case($relation['name']);
-                } else {
-                    $names = array_reverse(explode("\\", $relation['model']));
-                    $table = snake_case($names[0]);
-                }
-
-                $tables = [ str_singular($table), $i['name'] ];
-                sort($tables);
-                $tables[] = $modelName;
-                $this->pivotTables[] = $tables;
-            }
+            $i['pivotTables'] = $this->belongsTo($i['name'], $modelName, $i['belongsToMany']);
         }
 
         if($i['morphToMany']){
-            $relations = $this->getArgumentParser('relations-morphMany')->parse($i['morphToMany']);
-            foreach ($relations as $relation){
-                $table = '';
-
-                if(! $relation['through']){
-                    $names = array_reverse(explode("\\", $relation['model']));
-                    $morphable = snake_case($names[0]);
-                    $model = snake_case($relation['name']);
-                } else {
-                    $names = array_reverse(explode("\\", $relation['through']));
-                    $morphable = snake_case($names[0]);
-                    $names = array_reverse(explode("\\", $relation['model']));
-                    $model = snake_case($names[0]);
-                }
-
-                $tables = [ str_singular($model), str_singular($morphable), $modelName ];
-                $this->morphTables[] = $tables;
-            }
+            $i['morphTables'] = $this->morphToMany($modelName, $i['morphToMany']);
         }
 
         if($i['morphedByMany']){
-            $relations = $this->getArgumentParser('relations-morphMany')->parse($i['morphedByMany']);
-            foreach ($relations as $relation){
-                $table = '';
-
-                if(! $relation['through']){
-                    $names = array_reverse(explode("\\", $relation['model']));
-                    $morphable = snake_case($names[0]);
-                } else {
-                    $names = array_reverse(explode("\\", $relation['through']));
-                    $morphable = snake_case($names[0]);
-                }
-
-                $tables = [ str_singular($i['name']), str_singular($morphable), $modelName ];
-                $this->morphTables[] = $tables;
-            }
+            $i['morphTables'] = array_merge($i['morphTables'], $this->morphedByMany($i['name'], $modelName, $i['morphedByMany']));
         }
 
         $fields = [];
@@ -273,6 +256,66 @@ class ResourcesCommand extends BaseCommand {
         $i['fields'] = implode(' ', $fields);
 
         return $i;
+    }
+
+    protected function belongsTo($name, $modelName, $belongsTo)
+    {
+        $parsedRelations = [];
+        $relations = $this->getArgumentParser('relations')->parse($belongsTo);
+        foreach ($relations as $relation){
+            if(! $relation['model']){
+                $table = snake_case($relation['name']);
+            } else {
+                $table = snake_case($this->extractClassName($relation['model']));
+            }
+
+            $tables = [ str_singular($table), $name ];
+            sort($tables);
+            $tables[] = $modelName;
+            $parsedRelations[] = $tables;
+        }
+
+        return $parsedRelations;
+    }
+
+    protected function morphToMany($modelName, $morphToMany)
+    {
+        $parsedRelations = [];
+        $relations = $this->getArgumentParser('relations-morphMany')->parse();
+        foreach ($relations as $relation){
+            if(! $relation['through']){
+                $morphable = snake_case($this->extractClassName($relation['model']));
+                $model = snake_case($relation['name']);
+            } else {
+                $morphable = snake_case($this->extractClassName($relation['through']));
+                $model = snake_case($this->extractClassName($relation['model']));
+            }
+
+            $tables = [ str_singular($model), str_singular($morphable), $modelName ];
+            $parsedRelations[] = $tables;
+        }
+
+        return $parsedRelations;
+    }
+
+    protected function morphedByMany($name, $modelName, $morphedByMany)
+    {
+        $parsedRelations = [];
+        $relations = $this->getArgumentParser('relations-morphMany')->parse($morphedByMany);
+        foreach ($relations as $relation){
+            $table = '';
+
+            if(! $relation['through']){
+                $morphable = snake_case($this->extractClassName($relation['model']));
+            } else {
+                $morphable = snake_case($this->extractClassName($relation['through']));
+            }
+
+            $tables = [ str_singular($name), str_singular($morphable), $modelName ];
+            $parsedRelations[] = $tables;
+        }
+
+        return $parsedRelations;
     }
 
     protected function serializeField($field)
@@ -298,12 +341,12 @@ class ResourcesCommand extends BaseCommand {
         }));
     }
 
-    private function sortDependencies() {
+    private function sortDependencies($nodes) {
         $load_order = array();
         $seen       = array();
 
-        foreach($this->nodes as $key => $item) {
-            $tmp = $this->getDependencies($key, $seen);
+        foreach($nodes as $key => $item) {
+            $tmp = $this->getDependencies($nodes, $key, $seen);
 
             // if($tmp[2] === false) {
             $load_order = array_merge($load_order, $tmp[0]);
@@ -314,27 +357,27 @@ class ResourcesCommand extends BaseCommand {
         return $load_order;
     }
 
-    private function getDependencies($key, $seen = array()) {
-        if(array_key_exists($key, $seen) == true) {
+    private function getDependencies($nodes, $key, $seen = array()) {
+        if(array_key_exists($key, $seen) === true) {
             return array(array(), $seen);
         }
 
 
-        if(!empty($this->nodes[$key])) {
+        if(!empty($nodes[$key])) {
             $order = array();
             // $failed         = array();
 
-            if($this->nodes[$key]['belongsTo']) {
-                $deps = $this->getArgumentParser('relations')->parse($this->nodes[$key]['belongsTo']);
+            if($nodes[$key]['belongsTo']) {
+                $deps = $this->getArgumentParser('relations')->parse($nodes[$key]['belongsTo']);
                 foreach($deps as $dependency) {
                     if(! $dependency['model']){
 	                    $dependency['model'] = $dependency['name'];
 	                } else if(strpos($dependency['model'], '\\') !== false ){
-	                    $dependency['model'] = substr($dependency['model'], strpos($dependency['model'], '\\')+1);
+	                    $dependency['model'] = substr($dependency['model'], strpos($dependency['model'], '\\')+1); // Cut offs first namespace part
 	                }
                     $dependency['model'] = studly_case(str_singular($dependency['model']));
                     if ($dependency['model'] != $key) {
-                        $tmp = $this->getDependencies($dependency['model'], $seen);
+                        $tmp = $this->getDependencies($nodes, $dependency['model'], $seen);
 
                         $order  = array_merge($order, $tmp[0]);
                         $seen   = $tmp[1];
@@ -346,7 +389,7 @@ class ResourcesCommand extends BaseCommand {
                 }
             }
             $seen[$key]  = true;
-            $order[$key] = $this->nodes[$key];
+            $order[$key] = $nodes[$key];
             // $failed     = (count($failed) > 0) ? $failed : false;
 
             return array($order, $seen);//, $failed
@@ -380,42 +423,44 @@ class ResourcesCommand extends BaseCommand {
             foreach($relations as $relation) {
                 switch($type) {
                     case "belongsTo":
-                        $rModel = $relation['model']?$relation['model']:$relation['name']; break;
+                        $rModel = $relation['model'] ? $relation['model'] : $relation['name'];
+                        break;
+                    default: continue;
                 }
 
                 $search = array_search(studly_case(str_singular($rModel)), $keys);
-                if (($search === false || $search > $position) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($rModel))) && !class_exists('App\\' . ucwords(camel_case($rModel)))) {
+                if (($search === false || $search > $position) && !class_exists($this->prependNamespace($rModel)) && !class_exists($this->prependNamespace($rModel, 'App'))) {
                     $this->checkError(studly_case(str_singular($rModel)) . ": undefined (used in " . $type . "-relationship of model " . $model . " in file " . $file . ")");
-                } else if (class_exists($this->getNamespace() . '\\' . ucwords(camel_case($rModel)))) {
+                } else if (class_exists($this->prependNamespace($rModel))) {
                     $this->checkInfo(studly_case(str_singular($rModel)) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $type . "-relationship of model " . $model . " in file " . $file . ")");
-                } else if (class_exists('App\\' . ucwords(camel_case($rModel)))) {
+                } else if (class_exists($this->prependNamespace($rModel, 'App'))) {
                     $this->checkInfo(studly_case(str_singular($rModel)) . ": already defined in Namespace App\\ (used in " . $type . "-relationship of model " . $model . " in file " . $file . ")");
                 }
             }
         }
     }
 
-    protected function checkPivotRelations($relations, $rType) {
+    protected function checkPivotRelations($nodes, $relations, $rType) {
         if ($relations) {
             foreach($relations as $relation) {
                 $relation['0'] = studly_case(str_singular($relation['0']));
                 $relation['1'] = studly_case(str_singular($relation['1']));
                 $relation['2'] = studly_case(str_singular($relation['2']));
 
-                if (empty($this->nodes[$relation['0']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['0']))) && !class_exists('App\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkError($relation['0'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                if (empty($nodes[$relation['0']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['0']))) && !class_exists('App\\' . ucwords(camel_case($relation['0'])))) {
+                    $this->checkError($relation['0'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 } else if (class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 } else if (class_exists('App\\' . ucwords(camel_case($relation['0'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                    $this->checkInfo(studly_case(str_singular($relation['0'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 }
 
-                if ($rType == "pivot" && empty($this->nodes[$relation['1']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['1']))) && !class_exists('App\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkError($relation['1'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                if ($rType == "pivot" && empty($nodes[$relation['1']]) && !class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['1']))) && !class_exists('App\\' . ucwords(camel_case($relation['1'])))) {
+                    $this->checkError($relation['1'] . ": undefined (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 } else if ($rType == "pivot" && class_exists($this->getNamespace() . '\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace " . $this->getNamespace() . " (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 } else if ($rType == "pivot" && class_exists('App\\' . ucwords(camel_case($relation['1'])))) {
-                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $this->nodes[$relation['2']]['filename'] . ")");
+                    $this->checkInfo(studly_case(str_singular($relation['1'])) . ": already defined in Namespace App\\ (used in " . $rType . "-based relationship of model " . $relation['2'] . " in file " . $nodes[$relation['2']]['filename'] . ")");
                 }
             }
         }
