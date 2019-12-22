@@ -31,7 +31,7 @@ class ResourceCommand extends BaseCommand {
 
         $resourceName = $this->argument('name');
         $modelName = ucwords(camel_case($resourceName));
-        $tableName = str_plural($resourceName);
+        $tableName = Str::plural($resourceName);
 
         // generating the model
         $this->call('wn:model', [
@@ -163,7 +163,7 @@ class ResourceCommand extends BaseCommand {
             if($index) {
                 $name = substr($name, $index + 1);
             }
-            return Str::snake(str_singular($name)) . '_id';
+            return Str::snake(Str::singular($name)) . '_id';
         }, $relations);
     }
 
