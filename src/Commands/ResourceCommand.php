@@ -30,7 +30,7 @@ class ResourceCommand extends BaseCommand {
         $this->parseFields();
 
         $resourceName = $this->argument('name');
-        $modelName = ucwords(camel_case($resourceName));
+        $modelName = ucwords(Str::camel($resourceName));
         $tableName = Str::plural($resourceName);
 
         // generating the model
