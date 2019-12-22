@@ -33,7 +33,7 @@ class PivotTableCommand extends BaseCommand {
     protected function parseTables()
     {
         $this->tables = array_map(function($arg) {
-            return snake_case(\Illuminate\Support\Str::singular($this->argument($arg)));
+            return \Illuminate\Support\Str::snake(\Illuminate\Support\Str::singular($this->argument($arg)));
         }, ['model1', 'model2']);
 
         sort($this->tables);

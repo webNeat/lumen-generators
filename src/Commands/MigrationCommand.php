@@ -21,7 +21,7 @@ class MigrationCommand extends BaseCommand {
     {
         $table = $this->argument('table');
         $name = 'Create' . ucwords(\Illuminate\Support\Str::camel($table));
-        $snakeName = snake_case($name);
+        $snakeName = \Illuminate\Support\Str::snake($name);
 
         $content = $this->getTemplate('migration')
             ->with([
