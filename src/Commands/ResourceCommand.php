@@ -2,6 +2,7 @@
 
 
 use InvalidArgumentException;
+use Illuminate\Support\Str;
 
 class ResourceCommand extends BaseCommand {
 
@@ -162,7 +163,7 @@ class ResourceCommand extends BaseCommand {
             if($index) {
                 $name = substr($name, $index + 1);
             }
-            return snake_case(str_singular($name)) . '_id';
+            return Str::snake(str_singular($name)) . '_id';
         }, $relations);
     }
 
