@@ -25,7 +25,7 @@ class ControllerCommand extends BaseCommand {
     		$name = explode("\\", $model);
     		$name = $name[count($name) - 1];
     	}
-        $controller = ucwords(Illuminate\Support\Str::plural($name)) . 'Controller';
+        $controller = ucwords(\Illuminate\Support\Str::plural($name)) . 'Controller';
         $content = $this->getTemplate('controller')
         	->with([
         		'name' => $controller,
