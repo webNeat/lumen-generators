@@ -89,7 +89,7 @@ class ModelCommand extends BaseCommand {
             foreach ($items as $item) {
                 $item['type'] = $type;
                 if(! $item['model']){
-                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
+                    $item['model'] = $this->getNamespace() . '\\' . ucwords(\Illuminate\Support\Str::singular($item['name']));
                 } else if(strpos($item['model'], '\\') === false ){
                     $item['model'] = $this->getNamespace() . '\\' . $item['model'];
                 }

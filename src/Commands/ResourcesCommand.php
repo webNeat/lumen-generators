@@ -2,6 +2,7 @@
 
 use InvalidArgumentException;
 use Symfony\Component\Yaml\Yaml;
+use Illuminate\Support\Str;
 
 
 class ResourcesCommand extends BaseCommand {
@@ -26,8 +27,8 @@ class ResourcesCommand extends BaseCommand {
         $modelIndex = 0;
         foreach ($content as $model => $i){
             $i = $this->getResourceParams($model, $i);
-            $migrationName = 'Create' .  ucwords(str_plural($i['name']));
-            $migrationFile = date('Y_m_d_His') . '-' . str_pad($modelIndex , 3, 0, STR_PAD_LEFT) . '_' . snake_case($migrationName) . '_table';
+            $migrationName = 'Create' .  ucwords(Str::plural($i['name']));
+            $migrationFile = date('Y_m_d_His') . '-' . str_pad($modelIndex , 3, 0, STR_PAD_LEFT) . '_' . Str::snake($migrationName) . '_table';
 
 
             $options = [
@@ -76,7 +77,7 @@ class ResourcesCommand extends BaseCommand {
 
     protected function getResourceParams($modelName, $i)
     {
-        $i['name'] = snake_case($modelName);
+        $i['name'] = Str::snake($modelName);
 
         foreach(['hasMany', 'hasOne', 'add', 'belongsTo', 'belongsToMany'] as $relation){
             if(isset($i[$relation])){
@@ -92,13 +93,13 @@ class ResourcesCommand extends BaseCommand {
                 $table = '';
 
                 if(! $relation['model']){
-                    $table = snake_case($relation['name']);
+                    $table = Str::snake($relation['name']);
                 } else {
                     $names = array_reverse(explode("\\", $relation['model']));
-                    $table = snake_case($names[0]);
+                    $table = Str::snake($names[0]);
                 }
 
-                $tables = [ str_singular($table), $i['name'] ];
+                $tables = [ Str::singular($table), $i['name'] ];
                 sort($tables);
                 $this->pivotTables[] = $tables;
             }
@@ -117,10 +118,10 @@ class ResourcesCommand extends BaseCommand {
     protected function serializeField($field)
     {
         $name = $field['name'];
-        $schema = $this->convertArray(str_replace(':', '.', $field['schema']), ' ', ':');
+        $schema = $this->convertArray(Str::replace(':', '.', $field['schema']), ' ', ':');
         $rules = (isset($field['rules'])) ? trim($field['rules']) : '';
         // Replace space by comma
-        $rules = str_replace(' ', ',', $rules);
+        $rules = Str::replace(' ', ',', $rules);
 
         $tags = $this->convertArray($field['tags'], ' ', ',');
 

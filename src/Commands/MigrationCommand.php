@@ -20,8 +20,8 @@ class MigrationCommand extends BaseCommand {
     public function handle()
     {
         $table = $this->argument('table');
-        $name = 'Create' . ucwords(camel_case($table));
-        $snakeName = snake_case($name);
+        $name = 'Create' . ucwords(\Illuminate\Support\Str::camel($table));
+        $snakeName = \Illuminate\Support\Str::snake($name);
 
         $content = $this->getTemplate('migration')
             ->with([
@@ -129,7 +129,7 @@ class MigrationCommand extends BaseCommand {
             $key['column'] = 'id';
         }
         if(! $key['table']){
-            $key['table'] = str_plural(substr($key['name'], 0, count($key['name']) - 4));
+            $key['table'] = \Illuminate\Support\Str::plural(substr($key['name'], 0, strlen($key['name']) - 4));
         }
 
         $constraint = $this->getTemplate('migration/foreign-key')

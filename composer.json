@@ -1,6 +1,6 @@
 {
-    "name": "wn/lumen-generators",
-    "description": "A collection of generators for Lumen and Laravel 5.",
+    "name": "wn/lumen-generators-6",
+    "description": "A collection of generators for Lumen and Laravel 6.",
 	"keywords": ["lumen", "laravel", "rest", "api", "generators"],
     "license": "MIT",
     "authors": [
@@ -11,8 +11,8 @@
     ],
     "require": {
     	"php": ">=5.5.0",
-        "illuminate/console": "^5.1",
-        "illuminate/filesystem": "^5.1",
+        "illuminate/console": "^6.0",
+        "illuminate/filesystem": "^6.0",
         "fzaninotto/faker": "^1.5"
     },
     "autoload": {
