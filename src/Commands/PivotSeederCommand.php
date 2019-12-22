@@ -36,7 +36,7 @@ class PivotSeederCommand extends BaseCommand {
     protected function getResources()
     {
         $resources = array_map(function($arg) {
-            return snake_case(str_singular($this->argument($arg)));
+            return snake_case(Illuminate\Support\Str::singular($this->argument($arg)));
         }, ['model1', 'model2']);
 
         sort($resources);
@@ -46,13 +46,13 @@ class PivotSeederCommand extends BaseCommand {
 
     protected function getSeederName($resources) {
         $resources = array_map(function($resource){
-            return ucwords(camel_case($resource));
+            return ucwords(Illuminate\Support\Str::camel($resource));
         }, $resources);
         return implode('', $resources) . 'TableSeeder';
     }
 
     protected function getTableNames($resources) {
-        return array_map('str_plural', $resources);
+        return array_map('Illuminate\Support\Str::plural', $resources);
     }
 
 }
