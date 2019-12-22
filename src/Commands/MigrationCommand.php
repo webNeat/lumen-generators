@@ -129,7 +129,7 @@ class MigrationCommand extends BaseCommand {
             $key['column'] = 'id';
         }
         if(! $key['table']){
-            $key['table'] = \Illuminate\Support\Str::plural(substr($key['name'], 0, count($key['name']) - 4));
+            $key['table'] = \Illuminate\Support\Str::plural(substr($key['name'], 0, strlen($key['name']) - 4));
         }
 
         $constraint = $this->getTemplate('migration/foreign-key')
