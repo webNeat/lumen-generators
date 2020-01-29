@@ -32,7 +32,7 @@ class SeederCommand extends BaseCommand {
     protected function getSeederName($name)
     {
         $name = explode("\\", $name);
-        $name = ucwords(str_plural($name[count($name) - 1]));
+        $name = ucwords(\Illuminate\Support\Str::plural($name[count($name) - 1]));
         $name = $name . 'TableSeeder';
         return $name;
     }
