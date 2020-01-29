@@ -2,6 +2,7 @@
 
 
 use InvalidArgumentException;
+use Illuminate\Support\Str;
 
 class ResourceCommand extends BaseCommand {
 
@@ -29,8 +30,8 @@ class ResourceCommand extends BaseCommand {
         $this->parseFields();
 
         $resourceName = $this->argument('name');
-        $modelName = ucwords(camel_case($resourceName));
-        $tableName = str_plural($resourceName);
+        $modelName = ucwords(Str::camel($resourceName));
+        $tableName = Str::plural($resourceName);
 
         // generating the model
         $this->call('wn:model', [
@@ -162,7 +163,7 @@ class ResourceCommand extends BaseCommand {
             if($index) {
                 $name = substr($name, $index + 1);
             }
-            return snake_case(str_singular($name)) . '_id';
+            return Str::snake(Str::singular($name)) . '_id';
         }, $relations);
     }
 
