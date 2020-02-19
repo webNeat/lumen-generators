@@ -6,6 +6,7 @@ class ModelCommand extends BaseCommand {
 	protected $signature = 'wn:model
         {name : Name of the model.}
         {--fillable= : the fillable fields.}
+        {--guarded= : the guarded fields.}
         {--dates= : date fields.}
         {--has-many= : hasMany relationships.}
         {--has-one= : hasOne relationships.}
@@ -31,6 +32,7 @@ class ModelCommand extends BaseCommand {
                 'name' => $name,
                 'namespace' => $this->getNamespace(),
                 'fillable' => $this->getAsArrayFields('fillable'),
+                'guarded' => $this->getAsArrayFields('guarded'),
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
                 'rules' => $this->getRules(),
