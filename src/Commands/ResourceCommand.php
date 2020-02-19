@@ -37,6 +37,7 @@ class ResourceCommand extends BaseCommand {
         $this->call('wn:model', [
             'name' => $modelName,
             '--fillable' => $this->fieldsHavingTag('fillable'),
+            '--guarded' => $this->fieldsHavingTag('guarded'),
             '--dates' => $this->fieldsHavingTag('date'),
             '--has-many' => $this->option('has-many'),
             '--has-one' => $this->option('has-one'),
