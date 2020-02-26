@@ -50,6 +50,19 @@ trait RESTActions {
         $m::destroy($id);
         return $this->respond(Response::HTTP_NO_CONTENT);
     }
+    
+    public function BatchDelete(Request $request)
+    {
+        if (isset($request['itemsIDs'])) {
+        $itemsIDs = explode(',', $request['itemsIDs']);
+        foreach ($itemsIDs as $id) {
+            $this->remove($id);
+          }
+          return response()->json([
+              'message' => 'Deleted Successfully',
+          ]);
+        }
+    }
 
     protected function respond($status, $data = [])
     {
