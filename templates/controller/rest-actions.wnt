@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\Media;
 
 trait RESTActions {
 
@@ -32,11 +33,21 @@ trait RESTActions {
     {
         $m = self::MODEL;
         $this->validate($request, $m::$rules);
+        $input = $request->except(['images']);
 
+        $created_model = $m::create($input);
+
+        if(count($request['images']) > 0){
+            $images = $request['images'];
+
+            foreach($images as $name => $id){
+                $created_model->addMedia($id, $name);
+            }
+        }
         $modelName = explode("\\", $m);
         $message = $modelName[2] . " created successfully.";
         return response()->json([
-            'data' => $m::create($request->all()),
+            'data' => $created_model,
             'message' => $message
         ], Response::HTTP_CREATED);
     }
@@ -51,7 +62,19 @@ trait RESTActions {
                 'message' => "Not found"
             ], Response::HTTP_NOT_FOUND);
         }
-        $model->update($request->all());
+        $input = $request->except(['_method' , 'images']);
+
+        $model->update($input);
+
+        if (isset($request->images)) {
+            $images = $request->images;
+
+            foreach($images as $name => $id){
+                $media = Media::findOrFail($id);
+                $old_media = $model->getMediaByTag($name);
+                isset($old_media) ?  $model->updateMedia($old_media, $media, $name) : $model->addMedia($media, $name);
+            }
+        }
 
         $modelName = explode("\\", $m);
         $message = $modelName[2] . " updated successfully.";
@@ -64,12 +87,20 @@ trait RESTActions {
     public function remove($id)
     {
         $m = self::MODEL;
-        if(is_null($m::find($id))){
+        $model = $m::find($id);
+        $related_media = $model->getMediaCollection();
+
+        if(is_null($model)){
             return response()->json([
                 'message' => "Not found"
             ], Response::HTTP_NOT_FOUND);
         }
-        $m::destroy($id);
+        
+        foreach($related_media as $image){
+            $model->removeMediaByTag($image->id, $image->pivot->tag);
+        }
+        $model->destroy($id);
+
         return response()->json([
             'message' => "Deleted successfully."
         ], Response::HTTP_OK);
