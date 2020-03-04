@@ -1,9 +1,11 @@
 <?php namespace {{namespace}};
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasMedia;
 
 class {{name}} extends Model {
 
+    use HasMedia;
 {{uses}}    protected $fillable = [{{fillable}}];
 
     protected $dates = [{{dates}}];
