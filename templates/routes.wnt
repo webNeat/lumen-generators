@@ -6,3 +6,4 @@ $router->get('{{resource}}/{id}', '{{controller}}@get');
 $router->post('{{resource}}', '{{controller}}@add');
 $router->put('{{resource}}/{id}', '{{controller}}@put');
 $router->delete('{{resource}}/{id}', '{{controller}}@remove');
+$router->post('{{resource}}/batchDelete', '{{controller}}@BatchDelete');
