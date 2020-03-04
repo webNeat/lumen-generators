@@ -41,7 +41,7 @@ class ModelCommand extends BaseCommand {
             ])
             ->get();
 
-        $this->save($content, "./{$path}/{$name}.php", "{$name} model");
+        $this->save($content, "./App/Models/{$name}.php", "{$name} model");
     }
 
     protected function getAsArrayFields($arg, $isOption = true)
