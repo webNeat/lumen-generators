@@ -9,7 +9,9 @@ trait RESTActions {
     public function all()
     {
         $m = self::MODEL;
-        return $this->respond(Response::HTTP_OK, $m::all());
+        return response()->json([
+            'data' => $m::all()
+        ], Response::HTTP_OK);
     }
 
     public function get($id)
@@ -17,16 +19,26 @@ trait RESTActions {
         $m = self::MODEL;
         $model = $m::find($id);
         if(is_null($model)){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
-        return $this->respond(Response::HTTP_OK, $model);
+        return response()->json([
+            'data' => $model
+        ], Response::HTTP_OK);
     }
 
     public function add(Request $request)
     {
         $m = self::MODEL;
         $this->validate($request, $m::$rules);
-        return $this->respond(Response::HTTP_CREATED, $m::create($request->all()));
+
+        $modelName = explode("\\", $m);
+        $message = $modelName[2] . " created successfully.";
+        return response()->json([
+            'data' => $m::create($request->all()),
+            'message' => $message
+        ], Response::HTTP_CREATED);
     }
 
     public function put(Request $request, $id)
@@ -35,22 +47,34 @@ trait RESTActions {
         $this->validate($request, $m::$rules);
         $model = $m::find($id);
         if(is_null($model)){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
         $model->update($request->all());
-        return $this->respond(Response::HTTP_OK, $model);
+
+        $modelName = explode("\\", $m);
+        $message = $modelName[2] . " updated successfully.";
+        return response()->json([
+            'data' => $model,
+            'message' => $message
+        ], Response::HTTP_OK);
     }
 
     public function remove($id)
     {
         $m = self::MODEL;
         if(is_null($m::find($id))){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
         $m::destroy($id);
-        return $this->respond(Response::HTTP_NO_CONTENT);
+        return response()->json([
+            'message' => "Deleted successfully."
+        ], Response::HTTP_OK);
     }
-    
+
     public function BatchDelete(Request $request)
     {
         if (isset($request['itemsIDs'])) {
@@ -63,16 +87,4 @@ trait RESTActions {
           ]);
         }
     }
-
-    protected function respond($status, $data = [])
-    {
-        if($status == Response::HTTP_NO_CONTENT){
-			return response(null,Response::HTTP_NO_CONTENT);
-		}
-		if($status == Response::HTTP_NOT_FOUND){
-			return response(['message'=>'resource not found'],Response::HTTP_NOT_FOUND);
-		}
-        return response()->json($data, $status);
-    }
-
 }
