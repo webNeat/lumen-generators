@@ -12,8 +12,8 @@ class ModelCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--images= : images to be associated with model}
         {--rules= : fields validation rules.}
-        {--timestamps=true : enables timestamps on the model.}
         {--path=app : where to store the model php file.}
         {--soft-deletes= : adds SoftDeletes trait to the model.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
@@ -35,8 +35,9 @@ class ModelCommand extends BaseCommand {
                 'guarded' => $this->getAsArrayFields('guarded'),
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
+                'images' => $this->getImages('images'),
+                'appends' => $this->getAsArrayFields('images'),
                 'rules' => $this->getRules(),
-                'additional' => $this->getAdditional(),
                 'uses' => $this->getUses()
             ])
             ->get();
@@ -76,6 +77,33 @@ class ModelCommand extends BaseCommand {
         }
 
         return implode(PHP_EOL, $relations);
+    }
+
+    protected function getImages($option)
+    {
+        $images = [];
+        $option = $this->option($option);
+        if($option){
+
+            $items = $this->getArgumentParser('images')->parse($option);
+
+            $template = 'model/image';
+            $template = $this->getTemplate($template);
+            foreach ($items as $item) {
+                if(! $item['image']){
+                    $item['image'] = "get" . str_replace(' ', '', ucwords(str_replace('_', ' ', $item['name']))) . "Attribute";
+                }
+                $images[] = $template->with($item)->get();
+            }
+        }
+
+        $media = array_merge([], $images);
+
+        if(empty($media)){
+            return "    // Media methods";
+        }
+
+        return implode(PHP_EOL, $media);
     }
 
     protected function getRelationsByType($type, $option, $withTimestamps = false)
@@ -118,13 +146,6 @@ class ModelCommand extends BaseCommand {
         }
 
         return implode(PHP_EOL, $rules);
-    }
-
-    protected function getAdditional()
-    {
-        return $this->option('timestamps') == 'false'
-            ? "    public \$timestamps = false;" . PHP_EOL . PHP_EOL
-            : '';
     }
 
     protected function getUses()
