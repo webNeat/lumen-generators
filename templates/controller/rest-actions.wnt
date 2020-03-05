@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Media;
-
 trait RESTActions {
 
 
@@ -37,13 +36,16 @@ trait RESTActions {
 
         $created_model = $m::create($input);
 
-        if(count($request['images']) > 0){
-            $images = $request['images'];
-
-            foreach($images as $name => $id){
-                $created_model->addMedia($id, $name);
+        if($request->has('images')){
+            if(count($request['images']) > 0){
+                $images = $request['images'];
+    
+                foreach($images as $name => $id){
+                    $created_model->addMedia($id, $name);
+                }
             }
         }
+
         $modelName = explode("\\", $m);
         $message = $modelName[2] . " created successfully.";
         return response()->json([
@@ -109,13 +111,13 @@ trait RESTActions {
     public function BatchDelete(Request $request)
     {
         if (isset($request['itemsIDs'])) {
-        $itemsIDs = explode(',', $request['itemsIDs']);
-        foreach ($itemsIDs as $id) {
-            $this->remove($id);
-          }
-          return response()->json([
-              'message' => 'Deleted Successfully',
-          ]);
+            $itemsIDs = json_decode($request['itemsIDs']);
+            foreach ($itemsIDs as $id) {
+                $this->remove($id);
+            }
         }
+        return response()->json([
+              'message' => "Deleted successfully.",
+        ]);
     }
 }
