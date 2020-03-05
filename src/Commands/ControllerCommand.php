@@ -20,7 +20,7 @@ class ControllerCommand extends BaseCommand {
     	$name = '';
     	if(strrpos($model, "\\") === false){
     		$name = $model;
-    		$model = "App\\" . $model;
+    		$model = "App\\Models\\" . $model;
     	} else {
     		$name = explode("\\", $model);
     		$name = $name[count($name) - 1];
