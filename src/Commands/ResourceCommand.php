@@ -13,6 +13,7 @@ class ResourceCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--images= : images associated with resource}
         {--migration-file= : the migration file name.}
         {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--path=app : where to store the model file.}
@@ -43,10 +44,10 @@ class ResourceCommand extends BaseCommand {
             '--has-one' => $this->option('has-one'),
             '--belongs-to' => $this->option('belongs-to'),
             '--belongs-to-many' => $this->option('belongs-to-many'),
+            '--images' => $this->option('images'),
             '--rules' => $this->rules(),
             '--path' => $this->option('path'),
             '--force' => $this->option('force'),
-            '--timestamps' => $this->hasTimestamps() ? 'true' : 'false',
             '--soft-deletes' => $this->hasSoftDeletes() ? 'true' : 'false',
             '--parsed' => true
         ]);
