@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Media;
+use Illuminate\Support\Collection;
+
 trait RESTActions {
 
 
@@ -92,15 +94,24 @@ trait RESTActions {
         $model = $m::find($id);
         $related_media = $model->getMediaCollection();
 
+        // dd($related_media instanceof Collection);
+
         if(is_null($model)){
             return response()->json([
                 'message' => "Not found"
             ], Response::HTTP_NOT_FOUND);
         }
         
-        foreach($related_media as $image){
-            $model->removeMediaByTag($image->id, $image->pivot->tag);
+        if($related_media){
+            if($related_media instanceof Collection){
+                foreach($related_media as $image){
+                    $model->removeMediaByTag($image->id, $image->pivot->tag);
+                }
+            } else {
+                $model->removeMediaByTag($related_media->id, $related_media->pivot->tag);
+            }
         }
+        
         $model->destroy($id);
 
         return response()->json([
