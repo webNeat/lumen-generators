@@ -6,13 +6,14 @@ class ModelCommand extends BaseCommand {
 	protected $signature = 'wn:model
         {name : Name of the model.}
         {--fillable= : the fillable fields.}
+        {--guarded= : the guarded fields.}
         {--dates= : date fields.}
         {--has-many= : hasMany relationships.}
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--images= : images to be associated with model}
         {--rules= : fields validation rules.}
-        {--timestamps=true : enables timestamps on the model.}
         {--path=app : where to store the model php file.}
         {--soft-deletes= : adds SoftDeletes trait to the model.}
         {--parsed : tells the command that arguments have been already parsed. To use when calling the command from an other command and passing the parsed arguments and options}
@@ -31,15 +32,17 @@ class ModelCommand extends BaseCommand {
                 'name' => $name,
                 'namespace' => $this->getNamespace(),
                 'fillable' => $this->getAsArrayFields('fillable'),
+                'guarded' => $this->getAsArrayFields('guarded'),
                 'dates' => $this->getAsArrayFields('dates'),
                 'relations' => $this->getRelations(),
+                'images' => $this->getImages('images'),
+                'appends' => $this->getAsArrayFields('images'),
                 'rules' => $this->getRules(),
-                'additional' => $this->getAdditional(),
                 'uses' => $this->getUses()
             ])
             ->get();
 
-        $this->save($content, "./{$path}/{$name}.php", "{$name} model");
+        $this->save($content, "./App/Models/{$name}.php", "{$name} model");
     }
 
     protected function getAsArrayFields($arg, $isOption = true)
@@ -76,6 +79,33 @@ class ModelCommand extends BaseCommand {
         return implode(PHP_EOL, $relations);
     }
 
+    protected function getImages($option)
+    {
+        $images = [];
+        $option = $this->option($option);
+        if($option){
+
+            $items = $this->getArgumentParser('images')->parse($option);
+
+            $template = 'model/image';
+            $template = $this->getTemplate($template);
+            foreach ($items as $item) {
+                if(! $item['image']){
+                    $item['image'] = "get" . str_replace(' ', '', ucwords(str_replace('_', ' ', $item['name']))) . "Attribute";
+                }
+                $images[] = $template->with($item)->get();
+            }
+        }
+
+        $media = array_merge([], $images);
+
+        if(empty($media)){
+            return "    // Media methods";
+        }
+
+        return implode(PHP_EOL, $media);
+    }
+
     protected function getRelationsByType($type, $option, $withTimestamps = false)
     {
         $relations = [];
@@ -89,7 +119,7 @@ class ModelCommand extends BaseCommand {
             foreach ($items as $item) {
                 $item['type'] = $type;
                 if(! $item['model']){
-                    $item['model'] = $this->getNamespace() . '\\' . ucwords(str_singular($item['name']));
+                    $item['model'] = $this->getNamespace() . '\\' . ucwords(\Illuminate\Support\Str::singular($item['name']));
                 } else if(strpos($item['model'], '\\') === false ){
                     $item['model'] = $this->getNamespace() . '\\' . $item['model'];
                 }
@@ -116,13 +146,6 @@ class ModelCommand extends BaseCommand {
         }
 
         return implode(PHP_EOL, $rules);
-    }
-
-    protected function getAdditional()
-    {
-        return $this->option('timestamps') == 'false'
-            ? "    public \$timestamps = false;" . PHP_EOL . PHP_EOL
-            : '';
     }
 
     protected function getUses()

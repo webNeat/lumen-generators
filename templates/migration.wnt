@@ -13,6 +13,7 @@ class {{name}}Table extends Migration
 {{schema}}
 {{constraints}}
 {{additionals}}
+            $table->timestamps();
         });
     }
 

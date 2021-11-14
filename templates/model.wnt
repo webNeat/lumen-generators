@@ -1,17 +1,25 @@
-<?php namespace {{namespace}};
+<?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasMedia;
 
 class {{name}} extends Model {
 
+    use HasMedia;
 {{uses}}    protected $fillable = [{{fillable}}];
 
     protected $dates = [{{dates}}];
+
+    protected $guarded = [{{guarded}}];
+
+    protected $appends = [{{appends}}];
 
     public static $rules = [
 {{rules}}
     ];
 
-{{additional}}{{relations}}
+{{relations}}
+
+{{images}}
 
 }

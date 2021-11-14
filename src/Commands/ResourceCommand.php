@@ -2,6 +2,7 @@
 
 
 use InvalidArgumentException;
+use Illuminate\Support\Str;
 
 class ResourceCommand extends BaseCommand {
 
@@ -12,6 +13,7 @@ class ResourceCommand extends BaseCommand {
         {--has-one= : hasOne relationships.}
         {--belongs-to= : belongsTo relationships.}
         {--belongs-to-many= : belongsToMany relationships.}
+        {--images= : images associated with resource}
         {--migration-file= : the migration file name.}
         {--add= : specifies additional columns like timestamps, softDeletes, rememberToken and nullableTimestamps.}
         {--path=app : where to store the model file.}
@@ -29,22 +31,23 @@ class ResourceCommand extends BaseCommand {
         $this->parseFields();
 
         $resourceName = $this->argument('name');
-        $modelName = ucwords(camel_case($resourceName));
-        $tableName = str_plural($resourceName);
+        $modelName = ucwords(Str::camel($resourceName));
+        $tableName = Str::plural($resourceName);
 
         // generating the model
         $this->call('wn:model', [
             'name' => $modelName,
             '--fillable' => $this->fieldsHavingTag('fillable'),
+            '--guarded' => $this->fieldsHavingTag('guarded'),
             '--dates' => $this->fieldsHavingTag('date'),
             '--has-many' => $this->option('has-many'),
             '--has-one' => $this->option('has-one'),
             '--belongs-to' => $this->option('belongs-to'),
             '--belongs-to-many' => $this->option('belongs-to-many'),
+            '--images' => $this->option('images'),
             '--rules' => $this->rules(),
             '--path' => $this->option('path'),
             '--force' => $this->option('force'),
-            '--timestamps' => $this->hasTimestamps() ? 'true' : 'false',
             '--soft-deletes' => $this->hasSoftDeletes() ? 'true' : 'false',
             '--parsed' => true
         ]);
@@ -162,7 +165,7 @@ class ResourceCommand extends BaseCommand {
             if($index) {
                 $name = substr($name, $index + 1);
             }
-            return snake_case(str_singular($name)) . '_id';
+            return Str::snake(Str::singular($name)) . '_id';
         }, $relations);
     }
 

@@ -1,0 +1,4 @@
+    public function {{image}}()
+    {
+        return $this->getMediaByTag('{{name}}');
+    }

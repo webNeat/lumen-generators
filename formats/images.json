@@ -1,0 +1,15 @@
+{
+	"type": "array",
+	"fields": {
+        "type": "object",
+        "separator": ":",
+        "fields": [
+            "name",
+            {
+                "name": "image", 
+                "type": "string",
+                "default": false
+            }
+        ]
+    }
+}

@@ -1,7 +1,9 @@
-<?php namespace App\Http\Controllers;
+<?php namespace App\Traits;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\Media;
+use Illuminate\Support\Collection;
 
 trait RESTActions {
 
@@ -9,7 +11,9 @@ trait RESTActions {
     public function all()
     {
         $m = self::MODEL;
-        return $this->respond(Response::HTTP_OK, $m::all());
+        return response()->json([
+            'data' => $m::all()
+        ], Response::HTTP_OK);
     }
 
     public function get($id)
@@ -17,16 +21,39 @@ trait RESTActions {
         $m = self::MODEL;
         $model = $m::find($id);
         if(is_null($model)){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
-        return $this->respond(Response::HTTP_OK, $model);
+        return response()->json([
+            'data' => $model
+        ], Response::HTTP_OK);
     }
 
     public function add(Request $request)
     {
         $m = self::MODEL;
         $this->validate($request, $m::$rules);
-        return $this->respond(Response::HTTP_CREATED, $m::create($request->all()));
+        $input = $request->except(['images']);
+
+        $created_model = $m::create($input);
+
+        if($request->has('images')){
+            if(count($request['images']) > 0){
+                $images = $request['images'];
+    
+                foreach($images as $name => $id){
+                    $created_model->addMedia($id, $name);
+                }
+            }
+        }
+
+        $modelName = explode("\\", $m);
+        $message = $modelName[2] . " created successfully.";
+        return response()->json([
+            'data' => $created_model,
+            'message' => $message
+        ], Response::HTTP_CREATED);
     }
 
     public function put(Request $request, $id)
@@ -35,31 +62,73 @@ trait RESTActions {
         $this->validate($request, $m::$rules);
         $model = $m::find($id);
         if(is_null($model)){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
-        $model->update($request->all());
-        return $this->respond(Response::HTTP_OK, $model);
+        $input = $request->except(['_method' , 'images']);
+
+        $model->update($input);
+
+        if (isset($request->images)) {
+            $images = $request->images;
+
+            foreach($images as $name => $id){
+                $media = Media::findOrFail($id);
+                $old_media = $model->getMediaByTag($name);
+                isset($old_media) ?  $model->updateMedia($old_media, $media, $name) : $model->addMedia($media, $name);
+            }
+        }
+
+        $modelName = explode("\\", $m);
+        $message = $modelName[2] . " updated successfully.";
+        return response()->json([
+            'data' => $model,
+            'message' => $message
+        ], Response::HTTP_OK);
     }
 
     public function remove($id)
     {
         $m = self::MODEL;
-        if(is_null($m::find($id))){
-            return $this->respond(Response::HTTP_NOT_FOUND);
+        $model = $m::find($id);
+        $related_media = $model->getMediaCollection();
+
+        // dd($related_media instanceof Collection);
+
+        if(is_null($model)){
+            return response()->json([
+                'message' => "Not found"
+            ], Response::HTTP_NOT_FOUND);
         }
-        $m::destroy($id);
-        return $this->respond(Response::HTTP_NO_CONTENT);
+        
+        if($related_media){
+            if($related_media instanceof Collection){
+                foreach($related_media as $image){
+                    $model->removeMediaByTag($image->id, $image->pivot->tag);
+                }
+            } else {
+                $model->removeMediaByTag($related_media->id, $related_media->pivot->tag);
+            }
+        }
+        
+        $model->destroy($id);
+
+        return response()->json([
+            'message' => "Deleted successfully."
+        ], Response::HTTP_OK);
     }
 
-    protected function respond($status, $data = [])
+    public function BatchDelete(Request $request)
     {
-        if($status == Response::HTTP_NO_CONTENT){
-			return response(null,Response::HTTP_NO_CONTENT);
-		}
-		if($status == Response::HTTP_NOT_FOUND){
-			return response(['message'=>'resource not found'],Response::HTTP_NOT_FOUND);
-		}
-        return response()->json($data, $status);
+        if (isset($request['itemsIDs'])) {
+            $itemsIDs = json_decode($request['itemsIDs']);
+            foreach ($itemsIDs as $id) {
+                $this->remove($id);
+            }
+        }
+        return response()->json([
+              'message' => "Deleted successfully.",
+        ]);
     }
-
 }

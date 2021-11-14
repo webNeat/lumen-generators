@@ -12,7 +12,7 @@ class ControllerRestActionsCommand extends BaseCommand {
     {
         $content = $this->getTemplate('controller/rest-actions')->get();
 
-        $this->save($content, "./app/Http/Controllers/RESTActions.php", "REST actions trait");
+        $this->save($content, "./app/Traits/RESTActions.php", "REST actions trait");
     }
 
 }
